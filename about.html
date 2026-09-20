@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRB - Mission Statement & Statutory Authority</title>
+    <link rel="stylesheet" href="style.css">
+    <link id="dynamic-favicon" rel="icon" href="data:,">
+</head>
+<body>
+
+<div class="crt-overlay"></div>
+
+<div class="system-container">
+    
+    <header>
+        <div class="header-brand">
+            <div class="header-seal">⌛</div>
+            <h1>TEMPORAL RECOVERY BUREAU (TRB) ARCHIVAL REGISTRY</h1>
+        </div>
+        <div class="node-tag">SECURE ACCESS NODE-07 // ROOT INDEX</div>
+    </header>
+
+    <div class="viewport-layout">
+        
+        <nav>
+            <div class="directory-label">Main Directory</div>
+            <ul>
+                <li><a href="about.html">1. About</a></li>
+                <li><a href="notices.html">2. System Notices</a></li>
+                <li><a href="departments.html">3. Departments</a></li>
+                <li><a href="personnel.html">4. Personnel Directory</a></li>
+                <li><a href="archives.html">5. Archives</a></li>
+            </ul>
+
+            <div class="directory-label">System Telemetry</div>
+            <ul>
+                <li><a href="notices.html">CHRONO-GRID: OK</a></li>
+                <li><a href="discrepancies.html">DISCREPANCIES: <span class="redacted">NONE</span></a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <!-- Clock display header retained -->
+            <div class="metadata-strip" style="border-bottom: 2px double #808080; margin-bottom: 15px;">
+                SYSTEM TIMESTAMP: <span id="clock-display"></span>
+            </div>
+
+            <!-- Dynamic content target -->
+            <div id="mission-content">
+                <p class="regulatory-text">LOADING SYSTEM DIRECTIVES...</p>
+            </div>
+        </main>
+
+    </div>
+</div>
+
+<script type="module">
+    import { initTerminalClock, loadMissionText, verifyOperatorClearance, initRotatingFavicon } from './scripts.js';
+
+    async function initPage() {
+        // Start clock UI immediately
+        initTerminalClock('clock-display');
+        initRotatingFavicon('dynamic-favicon');
+
+        try {
+            // 1. Verify session telemetry (10-min window & database check)
+            const session = await verifyOperatorClearance();
+
+            if (!session.success) {
+                alert(session.error);
+                window.location.href = 'index.html'; // Redirects to stg2/index.html
+                return;
+            }
+
+            loadMissionText('mission-content');
+
+        } catch (err) {
+            console.error("[INIT-FAIL]", err);
+            const contentDiv = document.getElementById('mission-content');
+            if (contentDiv) {
+                contentDiv.innerHTML = `<p style="color: #ff0000; font-weight: bold;">
+                    SEC_ERROR: System initialization failed [${err.message}]. Check console logs.
+                </p>`;
+            }
+        }
+    }
+
+    initPage();
+</script>
+</body>
+</html>

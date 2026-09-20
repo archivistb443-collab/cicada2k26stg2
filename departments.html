@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRB - Bureau Structure & Departments</title>
+    <!-- External Retro Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <link id="dynamic-favicon" rel="icon" href="data:,">
+</head>
+<body>
+
+<div class="crt-overlay"></div>
+
+<div class="system-container">
+    
+    <header>
+        <div class="header-brand">
+            <div class="header-seal">⌛</div>
+            <h1>TEMPORAL RECOVERY BUREAU (TRB) ARCHIVAL REGISTRY</h1>
+        </div>
+        <div class="node-tag">SECURE ACCESS NODE-07 // DEPARTMENTS</div>
+    </header>
+
+    <div class="viewport-layout">
+        
+        <nav>
+            <div class="directory-label">Main Directory</div>
+            <ul>
+                <li><a href="about.html">1. About</a></li>
+                <li><a href="notices.html">2. System Notices</a></li>
+                <li><a href="departments.html">3. Departments</a></li>
+                <li><a href="personnel.html">4. Personnel Directory</a></li>
+                <li><a href="archives.html">5. Archives</a></li>
+            </ul>
+
+            <div class="directory-label">System Telemetry</div>
+            <ul>
+                <li><a href="notices.html">CHRONO-GRID: OK</a></li>
+                <li><a href="discrepancies.html">DISCREPANCIES: <span class="redacted">NONE</span></a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <h2>Section 3: Bureau Structure & Division Roster</h2>
+            <div class="metadata-strip">
+                REGISTRY INDEX: DEPT-STRUCTURE-V5 // VERIFIED: <span id="clock-display"></span>
+            </div>
+
+            <p class="regulatory-text">
+                The Temporal Recovery Bureau executes its operational charter across six specialized divisions. Each branch maintains independent terminal indexes, research labs, and field monitoring networks to uphold timeline stability.
+            </p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Division Code</th>
+                        <th>Division Title</th>
+                        <th>Sub-Units / Laboratories</th>
+                        <th>Direct Ledger Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>DIV-ADM</td>
+                        <td>Administration</td>
+                        <td>Directorate, Finance, Procurement</td>
+                        <td><a href="personnel.html" class="action-btn">ROSTER INDEX</a></td>
+                    </tr>
+                    <tr>
+                        <td>DIV-ARC</td>
+                        <td>Archive Division</td>
+                        <td>Archivist B443, Reading Room, Historical Records</td>
+                        <td><a href="archives.html" class="action-btn">ACCESS LEDGER</a></td>
+                    </tr>
+                    <tr>
+                        <td>DIV-RES</td>
+                        <td>Research Division</td>
+                        <td>Temporal Physics, Chroniton Lab, Payload Geometry</td>
+                        <td><a class="redacted">RESTRICTED</a></td>
+                    </tr>
+                    <tr>
+                        <td>DIV-COM</td>
+                        <td>Communications</td>
+                        <td>Relay Network, Satellite Control, Frequency Monitoring</td>
+                        <td><a href="notices.html" class="action-btn">NETWORK STATUS</a></td>
+                    </tr>
+                    <tr>
+                        <td>DIV-ENG</td>
+                        <td>Engineering</td>
+                        <td>Firmware, Node Maintenance, Deployment</td>
+                        <td><a class="redacted">RESTRICTED</a></td>
+                    </tr>
+                    <tr>
+                        <td>DIV-SEC</td>
+                        <td>Security</td>
+                        <td>Authentication, Access Control, Incident Response</td>
+                        <td><span class="redacted">RESTRICTED</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 25px; margin-bottom: 10px; font-size: 14px; font-weight: normal; text-decoration: underline;">
+                DEPARTMENTAL INTERCEPT & INTER-DIVISION COMMUNICATIONS
+            </h3>
+
+            <!-- Dynamic File Table Target Container -->
+            <div id="departments-files-container">
+                <p class="regulatory-text">FETCHING AUTHORIZED DEPARTMENTAL FILES...</p>
+            </div>
+        </main>
+
+    </div>
+</div>
+
+<script type="module">
+    import { initTerminalClock, renderStandardRegistryTable, initRotatingFavicon } from './scripts.js';
+
+    async function initPage() {
+        initRotatingFavicon(); 
+        initTerminalClock('clock-display');
+        await renderStandardRegistryTable('departments', 'departments-files-container');
+    }
+
+    initPage();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEMPORAL RECOVERY BUREAU - SECURE GATEWAY</title>
+    <!-- Links to your existing retro government stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Specific overrides to position and build the login dialogue box neatly */
+        body {
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-dialogue {
+            width: 380px;
+            background-color: #d4d0c8; /* Matches Windows Institutional Beige */
+            border: 3px double #808080;
+            box-shadow: 2px 2px 0px #000000;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .dialogue-titlebar {
+            background-color: #0a246a; /* Deep Administrative Blue */
+            color: #ffffff;
+            padding: 6px 12px;
+            font-weight: bold;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #808080;
+        }
+
+        .dialogue-body {
+            padding: 20px;
+            background-color: #faf8f5; /* Aged paper tint */
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        /* Mundane form fields matching classic style */
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 6px;
+            box-sizing: border-box;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 13px;
+            border: 1px solid #808080;
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: 2px solid #0a246a;
+        }
+
+        /* Classic heavy-bordered native administrative push button */
+        .submit-btn {
+            width: 100%;
+            padding: 8px;
+            background-color: #d4d0c8;
+            color: #000000;
+            border: 2px solid #ffffff;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            font-family: "Courier New", Courier, monospace;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 1px 1px 0px #000000;
+        }
+
+        .submit-btn:active {
+            border: 2px solid #808080;
+            border-right-color: #ffffff;
+            border-bottom-color: #ffffff;
+            box-shadow: none;
+            padding: 9px 7px 7px 9px; /* Simulates standard physical drop click */
+        }
+
+        #error-output {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #ff0000;
+            font-weight: bold;
+            border-top: 1px dashed #808080;
+            padding-top: 10px;
+            display: none;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Standardizing your custom raster overlay -->
+    <div class="crt-overlay"></div>
+
+    <!-- Dialogue Box Wrapper -->
+    <div class="login-dialogue">
+        <div class="dialogue-titlebar">
+            ⌛ SYSTEM AUTHENTICATION PROTOCOL 
+        </div>
+        
+        <div class="dialogue-body">
+            <p class="regulatory-text" style="font-size: 12px; margin-top: 0;">
+                <strong>NOTICE:</strong> Access restricted to cleared operators only. Unauthorized telemetry interrogation loops are tracked.
+            </p>
+
+            <div class="form-group">
+                <label for="username">Operator Name:</label>
+                <input type="text" id="username" placeholder="e.g., John Doe" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label for="badge">Badge Index ID:</label>
+                <input type="password" id="badge" placeholder="e.g., TRB-01">
+            </div>
+
+            <button id="login-btn" class="submit-btn">Verify Credentials</button>
+
+            <!-- Error message container -->
+            <div id="error-output"></div>
+        </div>
+    </div>
+
+<script>
+    document.getElementById('login-btn').addEventListener('click', () => {
+        const userIn = document.getElementById('username').value.trim();
+        const badgeIn = document.getElementById('badge').value.trim();
+        const errorDiv = document.getElementById('error-output');
+
+        if (!userIn || !badgeIn) {
+            errorDiv.innerText = "SEC_ERROR: Identification parameters required.";
+            errorDiv.style.color = "#ff0000";
+            errorDiv.style.display = "block";
+            return;
+        }
+
+        errorDiv.innerText = "Validating parameters...";
+        errorDiv.style.color = "#000000";
+        errorDiv.style.display = "block";
+
+        try {
+            // Build single login attempt payload
+            const currentAttempt = {
+                username: userIn,
+                badgeID: badgeIn,
+                timestamp: new Date().toISOString()
+            };
+
+            // Store ONLY the current attempt in cache (overwrites any previous entry)
+            localStorage.setItem('trb_current_login', JSON.stringify(currentAttempt));
+
+            // Render success state
+            errorDiv.innerText = `ACCESS GRANTED. PARAMETERS LOGGED.`;
+            errorDiv.style.color = "#008000";
+
+            setTimeout(() => {
+                window.location.href = 'about.html';
+            }, 1000);
+
+        } catch (err) {
+            console.error("[CACHE-FAIL]", err);
+            errorDiv.innerText = `CRITICAL_ERR: Cache write failure - ${err.message}`;
+            errorDiv.style.color = "#ff0000";
+        }
+    });
+</script>
+
+</body>
+</html>

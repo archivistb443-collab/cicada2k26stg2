@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRB - System Notices & Directive Logs</title>
+    <!-- External Retro Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <link id="dynamic-favicon" rel="icon" href="data:,">
+</head>
+<body>
+
+<div class="crt-overlay"></div>
+
+<div class="system-container">
+    
+    <header>
+        <div class="header-brand">
+            <div class="header-seal">⌛</div>
+            <h1>TEMPORAL RECOVERY BUREAU (TRB) ARCHIVAL REGISTRY</h1>
+        </div>
+        <div class="node-tag">SECURE ACCESS NODE-07 // SYSTEM NOTICES</div>
+    </header>
+
+    <div class="viewport-layout">
+        
+        <nav>
+            <div class="directory-label">Main Directory</div>
+            <ul>
+                <li><a href="about.html">1. About</a></li>
+                <li><a href="notices.html">2. System Notices</a></li>
+                <li><a href="departments.html">3. Departments</a></li>
+                <li><a href="personnel.html">4. Personnel Directory</a></li>
+                <li><a href="archives.html">5. Archives</a></li>
+            </ul>
+
+            <div class="directory-label">System Telemetry</div>
+            <ul>
+                <li><a href="notices.html">CHRONO-GRID: OK</a></li>
+                <li><a href="discrepancies.html">DISCREPANCIES: <span class="redacted">NONE</span></a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <h2>
+                SECTION 2: SYSTEM NOTICES & ADMINISTRATIVE DIRECTIVES
+            </h2>
+
+            <div class="metadata-strip" style="border-bottom: 1px dashed #808080; padding-bottom: 5px; margin-bottom: 15px; font-size: 11px; color: #555555;">
+                REGISTRY INDEX: NOTICES-MAINT-V2 // VERIFIED: <span id="clock-display"></span>
+            </div>
+
+            <p class="regulatory-text">
+                The Temporal Recovery Bureau issues binding operational directives and system notices regarding timeline stability maintenance, structural contracts, and ongoing facility telemetry. All assigned personnel must periodically review broadcasted notices to maintain procedural compliance.
+            </p>
+
+            <!-- Dynamic File Table Target Container -->
+            <div id="notices-files-container">
+                <p style="color: #555555;">FETCHING AUTHORIZED SYSTEM NOTICES...</p>
+            </div>
+
+            <div style="margin-top: 25px; padding: 10px; border: 1px solid #808080; background: #faf8f5;">
+                <p style="margin: 0; font-size: 11px; line-height: 1.4;">
+                    <strong>OPERATIONAL NOTICE:</strong> Modifications to Bell Tower infrastructure require written approval from Administration prior to scheduled timeline synchronization cycles.
+                </p>
+            </div>
+        </main>
+
+    </div>
+</div>
+
+<script type="module">
+    import { initTerminalClock, renderStandardRegistryTable, initRotatingFavicon } from './scripts.js';
+
+    async function initPage() {
+        initRotatingFavicon(); 
+        initTerminalClock('clock-display');
+        await renderStandardRegistryTable('system_notices', 'notices-files-container');
+
+    }
+
+    // Execute directly inside the module
+    initPage();
+</script>
+
+</body>
+</html>

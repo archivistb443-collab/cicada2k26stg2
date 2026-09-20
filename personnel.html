@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRB - Personnel Directory & Administrative Roster</title>
+    <!-- External Retro Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <link id="dynamic-favicon" rel="icon" href="data:,">
+</head>
+<body>
+
+<div class="crt-overlay"></div>
+
+<div class="system-container">
+    
+    <header>
+        <div class="header-brand">
+            <div class="header-seal">⌛</div>
+            <h1>TEMPORAL RECOVERY BUREAU (TRB) ARCHIVAL REGISTRY</h1>
+        </div>
+        <div class="node-tag">SECURE ACCESS NODE-07 // PERSONNEL</div>
+    </header>
+
+    <div class="viewport-layout">
+        
+        <nav>
+            <div class="directory-label">Main Directory</div>
+            <ul>
+                <li><a href="about.html">1. About</a></li>
+                <li><a href="notices.html">2. System Notices</a></li>
+                <li><a href="departments.html">3. Departments</a></li>
+                <li><a href="personnel.html">4. Personnel Directory</a></li>
+                <li><a href="archives.html">5. Archives</a></li>
+            </ul>
+
+            <div class="directory-label">System Telemetry</div>
+            <ul>
+                <li><a href="notices.html">CHRONO-GRID: OK</a></li>
+                <li><a href="discrepancies.html">DISCREPANCIES: <span class="redacted">NONE</span></a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <h2>Section 4: Personnel Directory & Staff Ledger</h2>
+            <div class="metadata-strip">
+                ROSTER VERIFIED: ROSTER-SEC-12 // STAMP: <span id="clock-display"></span>
+            </div>
+
+            <p class="regulatory-text">
+                Public index of active administrative directors, division leads, engineering officers, and research staff. Roster records are maintained pursuant to Bureau Administrative Directive 19-B.
+            </p>
+
+            <!-- Dynamic Personnel Roster Table -->
+            <div id="personnel-roster-container">
+                <p class="regulatory-text">FETCHING AUTHORIZED PERSONNEL RECORDS...</p>
+            </div>
+
+            <p class="regulatory-text" style="margin-top: 15px;">
+                <strong>DIRECT ACCESS POLICY:</strong> Unsolicited queries sent to Dr. Vance (Temporal Physics) or Security Analyst Owen Price require pre-screening clearance through Node Maintenance or Administration.
+            </p>
+
+            <div class="admin-notice" style="margin-top: 20px;">
+                <strong>SECURITY ADVISORY:</strong> Access to Archivist B443's specialized index files ("Janus Veil") requires Level-4 security credentials and a physical keycard verification at terminal Node-07.
+            </div>
+        </main>
+
+    </div>
+</div>
+
+<script type="module">
+    import { initTerminalClock, renderStandardRegistryTable, initRotatingFavicon } from './scripts.js';
+
+    async function initPage() {
+        initRotatingFavicon(); 
+        initTerminalClock('clock-display');
+        await renderStandardRegistryTable('personnel', 'personnel-roster-container');
+    }
+
+    initPage();
+</script>
+</body>
+</html>

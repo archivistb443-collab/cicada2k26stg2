@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRB - SECURITY DISCREPANCY REGISTRY</title>
+    <link rel="stylesheet" href="style.css">
+    <link id="dynamic-favicon" rel="icon" href="data:,">
+</head>
+<body>
+
+<div class="crt-overlay"></div>
+
+<div class="system-container">
+    
+    <header>
+        <div class="header-brand">
+            <div class="header-seal">⌛</div>
+            <h1>TEMPORAL RECOVERY BUREAU (TRB) ARCHIVAL REGISTRY</h1>
+        </div>
+        <div class="node-tag">SECURE ACCESS NODE-07 // AUDIT LOG</div>
+    </header>
+
+    <div class="viewport-layout">
+        
+        <nav>
+            <div class="directory-label">Main Directory</div>
+            <ul>
+                <li><a href="about.html">1. About</a></li>
+                <li><a href="notices.html">2. System Notices</a></li>
+                <li><a href="departments.html">3. Departments</a></li>
+                <li><a href="personnel.html">4. Personnel Directory</a></li>
+                <li><a href="archives.html">5. Archives</a></li>
+            </ul>
+
+            <div class="directory-label">System Telemetry</div>
+            <ul>
+                <li><a href="notices.html">CHRONO-GRID: OK</a></li>
+                <li><a href="discrepancies.html">DISCREPANCIES: <span id="discrepancy-badge-count">FETCHING...</span></a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <h2>Section 5: Automated Security Discrepancy Registry</h2>
+            <div class="metadata-strip">
+                LOGGING PROTOCOL: REAL-TIME SEC-AUDIT // VERIFIED: <span id="clock-display"></span>
+            </div>
+
+            <p class="regulatory-text">
+                The following ledger records anomalous telemetry, unauthorized credential escalations, and security boundary violations detected across Node-07 operational terminals. All events are immutable.
+            </p>
+
+            <table class="data-table">
+                <tbody id="discrepancies-table-body">
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #888;">QUERIED NODE AUDIT BUFFERS...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+
+    </div>
+</div>
+
+<script type="module">
+    import { initTerminalClock, initRotatingFavicon, loadDiscrepancies } from './scripts.js';
+
+    async function initPage() {
+        initRotatingFavicon();
+        initTerminalClock('clock-display');
+        await loadDiscrepancies();
+    }
+
+    initPage();
+</script>
+
+</body>
+</html>

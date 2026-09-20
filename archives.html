@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRB - Public Records & Temporal Archives</title>
+    <!-- External Retro Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <link id="dynamic-favicon" rel="icon" href="data:,">
+</head>
+<body>
+
+<div class="crt-overlay"></div>
+
+<div class="system-container">
+    
+    <header>
+        <div class="header-brand">
+            <div class="header-seal">⌛</div>
+            <h1>TEMPORAL RECOVERY BUREAU (TRB) ARCHIVAL REGISTRY</h1>
+        </div>
+        <div class="node-tag">SECURE ACCESS NODE-07 // ARCHIVES</div>
+    </header>
+
+    <div class="viewport-layout">
+        
+        <nav>
+            <div class="directory-label">Main Directory</div>
+            <ul>
+                <li><a href="about.html">1. About</a></li>
+                <li><a href="notices.html">2. System Notices</a></li>
+                <li><a href="departments.html">3. Departments</a></li>
+                <li><a href="personnel.html">4. Personnel Directory</a></li>
+                <li><a href="archives.html">5. Archives</a></li>
+            </ul>
+
+            <div class="directory-label">System Telemetry</div>
+            <ul>
+                <li><a href="notices.html">CHRONO-GRID: OK</a></li>
+                <li><a href="discrepancies.html">DISCREPANCIES: <span class="redacted">NONE</span></a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <h2>Section 5: Historical Ledger & Public Archive Repository</h2>
+            <div class="metadata-strip">
+                ARCHIVE CATALOG: REPO-1898-2002 // ACCESS STAMP: <span id="clock-display"></span>
+            </div>
+
+            <p class="regulatory-text">
+                The Public Archive Repository houses declassified event ledgers, physical artifact recovery receipts, and timeline audit logs dating from 1898 to 2002. Records are stored on cold-storage micro-tape arrays and served via local terminal index nodes.
+            </p>
+
+            <!-- Dynamic Archive Repository Table Container -->
+            <div id="archives-repository-container">
+                <p class="regulatory-text">FETCHING AUTHORIZED ARCHIVAL RECORDS...</p>
+            </div>
+
+            <p class="regulatory-text" style="margin-top: 15px;">
+                <strong>ARCHIVAL FOIA PROCEDURES:</strong> To request unredacted physical copies of Level-3 or higher records, citizens must file Form TRB-FOIA-99 along with a notarized declaration of timeline residency.
+            </p>
+
+            <div class="admin-notice" style="margin-top: 20px;">
+                <strong>CUSTODIAL WARNING:</strong> Magnetic tape degradations have been reported in Sector 05 archives. If downloaded records contain repeating character strings or non-standard ASCII patterns, report the error code directly to the Archival Custodian Desk.
+            </div>
+        </main>
+
+    </div>
+</div>
+
+<script type="module">
+    import { initTerminalClock, renderStandardRegistryTable, initRotatingFavicon } from './scripts.js';
+
+    async function initPage() {
+        initRotatingFavicon(); 
+        initTerminalClock('clock-display');
+        await renderStandardRegistryTable('archives', 'archives-repository-container');
+    }
+
+    // Execute directly inside the module
+    initPage();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+/* style.css - System-Wide Retro Government Terminal Stylesheet */
+
+/* Reset and Core Body Configurations */
+body {
+    background-color: #d4d0c8; /* Classic Windows 95/98 Institutional Beige */
+    font-family: "Courier New", Courier, monospace;
+    color: #000000;
+    margin: 0;
+    padding: 8px;
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Full Window Framework Container */
+.system-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 3px double #808080;
+    background-color: #ffffff;
+    box-shadow: 2px 2px 0px #000000;
+    box-sizing: border-box;
+}
+
+/* Deep Administrative Blue Top Banner */
+header {
+    background-color: #0a246a; 
+    color: #ffffff;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px double #808080;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+}
+
+.header-seal {
+    font-size: 24px;
+    margin-right: 15px;
+    border: 1px solid #ffffff;
+    padding: 2px 8px;
+    background: #000000;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.node-tag {
+    font-size: 11px;
+    background-color: #22c55e;
+    color: #ffffff;
+    padding: 2px 6px;
+    border: 1px solid #ffffff;
+    font-weight: bold;
+}
+
+/* Main Split Viewport Layout */
+.viewport-layout {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* Left Sidebar Navigation Tree */
+nav {
+    width: 250px;
+    background-color: #0a246a;
+    padding: 20px 15px;
+    border-right: 3px double #808080;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.directory-label {
+    color: #ffff00; /* Warning Yellow for Sub-sectors */
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 25px 0;
+}
+
+nav ul li {
+    margin-bottom: 12px;
+}
+
+/* Standardized Navigation Buttons linking to future separate files */
+nav ul li a {
+    color: #cbd5e1;
+    text-decoration: underline;
+    font-size: 13px;
+    display: block;
+    cursor: pointer;
+}
+
+nav ul li a:hover {
+    color: #ffffff;
+    background-color: #4b639e;
+    text-decoration: none;
+}
+
+/* Main Document Content Area */
+main {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: #faf8f5; /* Slightly aged paper tint */
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+h2 {
+    text-transform: uppercase;
+    text-decoration: underline;
+    margin-top: 0;
+    color: #000000;
+    font-size: 18px;
+}
+
+.metadata-strip {
+    font-size: 12px;
+    color: #555555;
+    margin-bottom: 20px;
+    border-bottom: 1px dashed #808080;
+    padding-bottom: 8px;
+}
+
+.regulatory-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #111111;
+    max-width: 950px;
+    margin-bottom: 25px;
+}
+
+/* Mundane Grid Tables */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+}
+
+.data-table th, .data-table td {
+    border: 1px solid #808080;
+    padding: 10px;
+    text-align: left;
+    font-size: 12px;
+}
+
+.data-table th {
+    background-color: #d4d0c8;
+    font-weight: bold;
+}
+
+.data-table tr:nth-child(even) {
+    background-color: #f1f0ec;
+}
+
+/* Standardized Anchor Links for Datatable Buttons */
+.action-btn {
+    color: #0000ee;
+    text-decoration: underline;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    color: #ff0000;
+}
+
+/* Inconspicuous Administrative Notices */
+.admin-notice {
+    border: 1px solid #808080;
+    background-color: #ffffff;
+    padding: 15px;
+    margin-top: 35px;
+    color: #333333;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Heavy Administrative Security Ink Strips */
+.redacted {
+    background-color: #000000;
+    color: #000000;
+    padding: 0 3px;
+    user-select: none;
+}
+
+/* Subtle Raster Scanline overlay for old CRT vibe */
+.crt-overlay {
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.03) 50%);
+    background-size: 100% 4px;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 9999;
+    pointer-events: none;
+}
