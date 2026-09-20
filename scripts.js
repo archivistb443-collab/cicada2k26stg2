@@ -196,7 +196,7 @@ export async function loadMissionText(targetElementId) {
     if (!session || !session.success) return;
 
     try {
-        const response = await fetch('../data/mission.txt');
+        const response = await fetch('mission.txt');
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: Failed to locate mission directive file.`);
