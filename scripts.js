@@ -7,16 +7,6 @@ export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Shared Supabase client instance
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Clearance mapping for accessible tiers
-const ACCESSIBLE_TIERS = {
-    'USER': ['USER'],
-    'CONTRACTOR': ['USER', 'CONTRACTOR'],
-    'COMMUNICATIONS': ['USER', 'CONTRACTOR', 'COMMUNICATIONS'],
-    'RESEARCH': ['USER', 'CONTRACTOR', 'RESEARCH'],
-    'SECURITY': ['USER', 'CONTRACTOR', 'COMMUNICATIONS', 'RESEARCH', 'SECURITY'],
-    'ADMIN': ['USER', 'CONTRACTOR', 'COMMUNICATIONS', 'RESEARCH', 'SECURITY', 'ADMIN']
-};
-
 /**
  * Initialize a live updating UTC clock in any target element ID
  */
@@ -54,9 +44,6 @@ export function showTopNotification(message) {
     banner.innerText = `⚠️ SYSTEM ALERT: ${message}`;
 }
 
-/**
- * Verify operator session clearance cache
- */
 export async function verifyOperatorClearance() {
     const CACHE_KEY = 'trb_current_login';
     const MAX_AGE_MS = 10 * 60 * 1000;
@@ -83,12 +70,13 @@ export async function verifyOperatorClearance() {
     }
 
     try {
-        const { data, error } = await supabase
-            .from('users')
-            .select('clearance, status')
-            .eq('username', username)
-            .eq('badge_id', badgeID)
-            .maybeSingle();
+        // Call the secure RPC function instead of querying the locked users table directly
+        const { data: profileData, error } = await supabase.rpc('get_operator_profile', {
+            input_username: username,
+            input_badge: badgeID
+        });
+
+        const data = profileData && profileData.length > 0 ? profileData[0] : null;
 
         if (error || !data) return await failAndRedirect("Credentials mismatched in bureau registry.");
         if (data.status !== 'ACTIVE') return await failAndRedirect(`Operator status suspended [${data.status}].`);
@@ -99,23 +87,19 @@ export async function verifyOperatorClearance() {
     }
 }
 
-/**
- * Fetch records from filesystem matching clearances
- */
+
 async function fetchModuleRecords(directoryName) {
     try {
         const session = await verifyOperatorClearance();
         if (!session || !session.success) return [];
 
         const userTier = session.clearance.toUpperCase();
-        const allowedClearances = ACCESSIBLE_TIERS[userTier] || ['USER'];
-        const cleanDir = directoryName.toLowerCase();
 
-        const { data, error } = await supabase
-            .from('filesystem')
-            .select('*')
-            .in('access_clearance', allowedClearances)
-            .or(`directory.ilike.${cleanDir},path.ilike./${cleanDir}/%`);
+        // Call the dedicated server-side RPC function securely
+        const { data, error } = await supabase.rpc('fetch_module_records', {
+            directory_name: directoryName,
+            player_clearance: userTier
+        });
 
         if (error) {
             console.error(`[SUPABASE-FETCH-FAIL]`, error.message);
@@ -282,17 +266,11 @@ export async function logDiscrepancy(supabaseClient, player, eventType, details 
     }
 }
 
-/**
- * Load and render discrepancies into the frontend table and counter
- */
 export async function loadDiscrepancies() {
     const tbody = document.getElementById('discrepancies-table-body');
     const badgeCount = document.getElementById('discrepancy-badge-count');
 
-    const { data: logs, error } = await supabase
-        .from('discrepancies')
-        .select('alias, event_type, details, timestamp')
-        .order('timestamp', { ascending: false });
+    const { data: logs, error } = await supabase.rpc('get_discrepancy_feed');
 
     if (error) {
         if (tbody) tbody.innerHTML = `<tr><td colspan="4" style="color: #ef4444;">ERR_LOG_FETCH_FAILED: ${error.message}</td></tr>`;
@@ -314,12 +292,12 @@ export async function loadDiscrepancies() {
         tbody.innerHTML = '';
         logs.forEach(log => {
             const tr = document.createElement('tr');
-            const formattedDate = new Date(log.timestamp).toISOString().replace('T', ' ').substring(0, 19);
+            const formattedDate = log.timestamp ? new Date(log.timestamp).toISOString().replace('T', ' ').substring(0, 19) : '';
 
             tr.innerHTML = `
                 <td style="font-size: 0.8rem; color: #aaa;">${formattedDate} UTC</td>
                 <td> [${log.alias || 'UNKNOWN'}]</td>
-                <td style="font-weight: bold; color: #fff;">${log.event_type}</td>
+                <td style="font-weight: bold; color: #bbb;">${log.event_type}</td>
                 <td style="font-size: 0.85rem;">${log.details || ''}</td>
             `;
             tbody.appendChild(tr);
