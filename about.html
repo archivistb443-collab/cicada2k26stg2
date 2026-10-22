@@ -18,7 +18,7 @@
             <div class="header-seal">⌛</div>
             <h1>TEMPORAL RECOVERY BUREAU (TRB) ARCHIVAL REGISTRY</h1>
         </div>
-        <div class="node-tag">SECURE ACCESS NODE-07 // ROOT INDEX</div>
+        <div class="node-tag" id="node-tag" style="cursor: pointer;">SECURE ACCESS NODE-07 // ROOT INDEX</div>
     </header>
 
     <div class="viewport-layout">
@@ -56,7 +56,9 @@
 </div>
 
 <script type="module">
-    import { initTerminalClock, loadMissionText, verifyOperatorClearance, initRotatingFavicon } from './scripts.js';
+    import { initTerminalClock, loadMissionText, verifyOperatorClearance, initRotatingFavicon, getOperatorClearance, showTopNotification } from './scripts.js';
+
+    const PUZZLE_PAGE = 'tensor_collapse.html';
 
     async function initPage() {
         // Start clock UI immediately
@@ -87,6 +89,22 @@
     }
 
     initPage();
+
+    // Hidden entry point: clicking the green node tag. Admin (or A) clearance only.
+    document.getElementById('node-tag').addEventListener('click', async () => {
+        try {
+            const clearance = await getOperatorClearance();
+            if (clearance === 'admin' || clearance === 'a') {
+                window.location.href = PUZZLE_PAGE;
+            } else {
+                showTopNotification('ADMIN CLEARANCE REQUIRED.');
+                setTimeout(() => document.getElementById('trb-top-popup')?.remove(), 2500);
+            }
+        } catch (err) {
+            showTopNotification(err.message);
+            setTimeout(() => document.getElementById('trb-top-popup')?.remove(), 2500);
+        }
+    });
 </script>
 </body>
 </html>
