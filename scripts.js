@@ -88,6 +88,52 @@ export async function verifyOperatorClearance() {
 }
 
 
+/**
+ * Read the operator's CURRENT clearance from the database (no redirects).
+ * Returns it lower-cased, e.g. 'user', 'admin', 'a'.
+ * Throws an Error with a readable message if there is no valid session.
+ */
+export async function getOperatorClearance() {
+    const raw = localStorage.getItem('trb_current_login');
+    if (!raw) throw new Error('NO ACTIVE SESSION');
+
+    let session;
+    try { session = JSON.parse(raw); } catch (e) { throw new Error('MALFORMED SESSION'); }
+
+    const { username, badgeID } = session;
+    if (!username || !badgeID) throw new Error('INCOMPLETE SESSION');
+
+    const { data: profileData, error } = await supabase.rpc('get_operator_profile', {
+        input_username: username,
+        input_badge: badgeID
+    });
+
+    const data = profileData && profileData.length > 0 ? profileData[0] : null;
+    if (error || !data) throw new Error('CREDENTIALS NOT FOUND');
+    if (data.status !== 'ACTIVE') throw new Error(`OPERATOR STATUS: ${data.status}`);
+
+    return String(data.clearance || 'USER').toLowerCase();
+}
+
+/**
+ * Submit the puzzle answer. The answer is checked on the server (Supabase),
+ * which also promotes the operator to clearance 'A' if it is correct.
+ * Resolves true if correct, false if wrong. Throws on errors / not allowed.
+ */
+export async function submitTensorCollapseFlag(flag) {
+    const raw = localStorage.getItem('trb_current_login');
+    if (!raw) throw new Error('NO ACTIVE SESSION');
+    const { username, badgeID } = JSON.parse(raw);
+
+    const { data, error } = await supabase.rpc('solve_tensor_collapse', {
+        input_username: username,
+        input_badge: badgeID,
+        submitted_flag: flag
+    });
+    if (error) throw new Error(error.message);
+    return data === true;
+}
+
 async function fetchModuleRecords(directoryName) {
     try {
         const session = await verifyOperatorClearance();
