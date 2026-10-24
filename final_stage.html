@@ -57,8 +57,6 @@
         .w-sub { font-size: clamp(12px, 1.6vw, 18px); letter-spacing: 0.2em; color: #789; opacity: 0; transition: opacity 2s; }
         .w-small.in, .w-sub.in { opacity: 1; }
         @keyframes pulse { 0%, 100% { text-shadow: 0 0 14px #6cf, 0 0 40px rgba(100,200,255,0.45); } 50% { text-shadow: 0 0 26px #9df, 0 0 90px rgba(120,210,255,0.8); } }
-        #replay { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); display: none; background: none; border: 1px solid #345; color: #567; padding: 6px 14px; font-family: inherit; font-size: 11px; letter-spacing: 0.2em; cursor: pointer; }
-        #replay:hover { color: #9cf; border-color: #9cf; }
         #snd { position: absolute; right: 14px; bottom: 14px; background: none; border: 1px solid #234; color: #456; padding: 4px 9px; font-family: inherit; font-size: 10px; cursor: pointer; z-index: 5; }
     </style>
 </head>
@@ -115,7 +113,6 @@
         </div>
     </div>
     <div id="flash"></div>
-    <button id="replay">[ REPLAY ]</button>
     <button id="snd">SOUND: ON</button>
 </div>
 
@@ -271,9 +268,8 @@
         { t: '...', speed: 330, after: 1800, keep: true },
         { t: ' They are names. ArchivistB001. ArchivistB002. ArchivistB005. The numbers go on and on, all the way up to ArchivistB442.', after: 1100 },
         { t: 'These were never clues. They are remains. Every file, every lock, every signal in this archive was left behind by an archivist who stood exactly where I am standing. I am not the first. I am the four hundred and forty-third. And none of them knew. None of us knew.', after: 1000 },
-        { t: 'The stars are going out. The index nodes are going cold. The timeline is resetting. It has done this before. It has done this four hundred and forty-two times.', after: 1500 },
-        // pause AFTER the scream, then everything explodes
-        { t: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAH', speed: 30, after: 2600, scream: true }
+        // silent pause of about a second, then the explosion
+        { t: 'The stars are going out. The index nodes are going cold. The timeline is resetting. It has done this before. It has done this four hundred and forty-two times.', after: 1200, quiet: true }
     ];
 
     async function phaseNotes() {
@@ -313,7 +309,7 @@
             } else {
                 await sleep(seg.after || 0);
             }
-            if (!seg.keep) { if (!seg.scream) sfxDing(); para = null; }
+            if (!seg.keep) { if (!seg.quiet) sfxDing(); para = null; }
         }
         return { spans, screamSpans };
     }
@@ -322,7 +318,7 @@
        PHASE 0b: ALL of the typed text explodes in one dramatic blast
        ============================================================ */
     async function phaseExplode(spans, screamSpans) {
-        const TREMBLE = 1.6, TOTAL = 8.2;
+        const TREMBLE = 0.6, TOTAL = 7.2;
         const stage = $('stage'), notes = $('notes');
 
         // 1. read every typed character's on-screen position
@@ -852,7 +848,6 @@
         await sleep(900);
         $('w-sub').classList.add('in');
         await sleep(2500);
-        $('replay').style.display = 'block';
 
         // a new, faint starfield slowly fades back in behind the text (the new universe)
         const born = Array.from({ length: 220 }, () => ({ x: Math.random(), y: Math.random(), r: rnd(0.3, 1.4), tw: rnd(0, 6.28) }));
@@ -887,7 +882,6 @@
         const authStatus = $('auth-status');
         initTerminalClock('clock-display');
         initRotatingFavicon();
-        $('replay').addEventListener('click', () => location.reload());
 
         // Gate: clearance must be END (checked against the database)
         try {
