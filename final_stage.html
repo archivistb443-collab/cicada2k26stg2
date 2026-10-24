@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRB // FINAL STAGE</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .submit-btn { padding: 8px 18px; background-color: #d4d0c8; color: #000; border: 2px solid #fff; border-right-color: #808080; border-bottom-color: #808080; font-family: "Courier New", Courier, monospace; font-weight: bold; font-size: 12px; cursor: pointer; text-transform: none; box-shadow: 1px 1px 0 #000; }
+        .submit-btn:active { border: 2px solid #808080; border-right-color: #fff; border-bottom-color: #fff; box-shadow: none; }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #artifact { display: none; }
+        .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin: 22px 0 10px; }
+        #msg { margin-top: 12px; font-size: 12px; font-weight: bold; min-height: 18px; }
+
+        /* ---------- Cinematic finale ---------- */
+        #cinema { display: none; position: fixed; inset: 0; background: #000; z-index: 100000; overflow: hidden; font-family: "Courier New", Courier, monospace; color: #fff; }
+        #cinema.on { display: block; }
+        #stage { position: absolute; inset: 0; }
+        #fx { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+        #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+
+        /* ArchivistB443 typing his notes */
+        #notes { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(860px, 92vw); max-height: 86vh; overflow: hidden; opacity: 0; transition: opacity 1.2s; font-size: clamp(13px, 1.7vw, 19px); line-height: 1.65; color: #cfe; pointer-events: none; }
+        #notes.show { opacity: 1; }
+        .n-head { color: #567; font-size: 0.75em; letter-spacing: 0.2em; margin-bottom: 18px; padding-bottom: 8px; border-bottom: 1px solid #234; }
+        #n-body { white-space: pre-wrap; }
+        #n-body .para { margin-bottom: 1.1em; }
+        #n-body .scream-line { margin-top: 1.4em; }
+        #n-body .scream { color: #ff3b3b; font-size: 1.5em; font-weight: bold; text-shadow: 2px 0 #f0f, -2px 0 #0ff; }
+        #cur { color: #9fe; animation: blink 0.9s steps(1) infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        #reset-title { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: clamp(26px, 7vw, 96px); font-weight: bold; letter-spacing: 0.12em; white-space: nowrap; color: #fff; text-shadow: 3px 0 #f0f, -3px 0 #0ff, 0 0 24px rgba(255,255,255,0.7); opacity: 0; pointer-events: none; }
+        #reset-title.show { opacity: 1; animation: glitch 0.22s infinite steps(2, end); }
+        @keyframes glitch {
+            0%   { transform: translate(-50%, -50%) skewX(0deg); }
+            20%  { transform: translate(calc(-50% + 7px), -50%) skewX(9deg); text-shadow: -6px 0 #f0f, 6px 0 #0ff; }
+            40%  { transform: translate(calc(-50% - 9px), calc(-50% + 3px)) skewX(-6deg); }
+            60%  { transform: translate(-50%, calc(-50% - 4px)) skewX(4deg); text-shadow: 5px 0 #f0f, -5px 0 #0ff; }
+            80%  { transform: translate(calc(-50% + 4px), calc(-50% + 2px)) skewX(-10deg); }
+            100% { transform: translate(-50%, -50%) skewX(0deg); }
+        }
+        #cycle { position: absolute; left: 18px; bottom: 16px; font-size: 13px; color: #f66; letter-spacing: 0.08em; }
+
+        #del-log { position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%); width: min(680px, 92vw); font-size: 15px; color: #9fe; transition: opacity 1.2s; }
+        .dl { display: flex; gap: 12px; margin-top: 6px; white-space: nowrap; }
+        .dl .lbl { width: 12.5em; color: #fff; }
+        .dl .bar { color: #6cf; }
+        .dl .pct { width: 3.2em; text-align: right; }
+        .dl.done .lbl::after { content: "  OK"; color: #6f6; }
+
+        #welcome { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+        #welcome.show { display: flex; }
+        .w-small { font-size: clamp(16px, 2.4vw, 28px); letter-spacing: 0.3em; color: #9ab; opacity: 0; transition: opacity 1.4s; }
+        .w-big { font-size: clamp(30px, 8.5vw, 120px); font-weight: bold; letter-spacing: 0.06em; margin: 18px 0; min-height: 1.2em; color: #fff; text-shadow: 0 0 18px #6cf, 0 0 60px rgba(100,200,255,0.6); animation: pulse 3.2s ease-in-out infinite; }
+        .w-sub { font-size: clamp(12px, 1.6vw, 18px); letter-spacing: 0.2em; color: #789; opacity: 0; transition: opacity 2s; }
+        .w-small.in, .w-sub.in { opacity: 1; }
+        @keyframes pulse { 0%, 100% { text-shadow: 0 0 14px #6cf, 0 0 40px rgba(100,200,255,0.45); } 50% { text-shadow: 0 0 26px #9df, 0 0 90px rgba(120,210,255,0.8); } }
+        #replay { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); display: none; background: none; border: 1px solid #345; color: #567; padding: 6px 14px; font-family: inherit; font-size: 11px; letter-spacing: 0.2em; cursor: pointer; }
+        #replay:hover { color: #9cf; border-color: #9cf; }
+        #snd { position: absolute; right: 14px; bottom: 14px; background: none; border: 1px solid #234; color: #456; padding: 4px 9px; font-family: inherit; font-size: 10px; cursor: pointer; z-index: 5; }
+    </style>
+</head>
+<body>
+
+<div class="crt-overlay"></div>
+
+<div class="system-container">
+    <header>
+        <div class="header-brand">
+            <div class="header-seal">⌛</div>
+            <h1>TEMPORAL RECOVERY BUREAU (TRB) ARCHIVAL REGISTRY</h1>
+        </div>
+        <div class="node-tag">SECURE ACCESS NODE-07 // FINAL STAGE</div>
+    </header>
+
+    <div class="viewport-layout">
+        <main>
+            <div id="auth-status" class="regulatory-text"><strong>QUERYING OPERATOR CLEARANCE...</strong></div>
+
+            <div id="artifact">
+                <h2>RECOVERED ARTIFACT // ARCHIVIST LOG</h2>
+                <div class="metadata-strip">CLEARANCE: END // VERIFIED: <span id="clock-display"></span></div>
+
+                <p class="regulatory-text">
+                    Clearance level END verified. A single log file has been recovered from the deepest cold-storage tier of the archive.
+                    Its format could not be identified and its integrity is reported as corrupted. Download the file and examine it carefully before you continue.
+                </p>
+                <p class="regulatory-text">
+                    A second item was recovered alongside the log: the personal notes of ArchivistB443. They can be opened once the log has been downloaded.
+                </p>
+
+                <div class="btn-row">
+                    <button class="submit-btn" id="dl-btn">[ DOWNLOAD RECOVERED LOG ]</button>
+                    <button class="submit-btn" id="go-btn" disabled>[ ArchivistB443 notes ]</button>
+                </div>
+                <div id="msg"></div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div id="cinema">
+    <div id="stage">
+        <canvas id="fx"></canvas>
+        <div id="notes"><div class="n-head">ArchivistB443 // PERSONAL NOTES</div><div id="n-body"></div></div>
+        <div id="reset-title">TIMELINE RESETTING</div>
+        <div id="cycle"></div>
+        <div id="del-log"></div>
+        <div id="welcome">
+            <div class="w-small" id="w-small">Welcome,</div>
+            <div class="w-big" id="w-name"></div>
+            <div class="w-sub" id="w-sub">TIMELINE 444 INITIALIZED &nbsp;//&nbsp; THE SURVEY BEGINS</div>
+        </div>
+    </div>
+    <div id="flash"></div>
+    <button id="replay">[ REPLAY ]</button>
+    <button id="snd">SOUND: ON</button>
+</div>
+
+<script type="module">
+    import { getOperatorClearance, initTerminalClock, initRotatingFavicon } from './scripts.js';
+
+    const BACK_PAGE = 'about.html';
+
+    // The recovered log: a polyglot (a valid PDF that is also a valid ZIP archive).
+    // It is only turned into a downloadable file after the clearance check passes.
+    const POLY_B64 = 'JVBERi0xLjMKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjEgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9CYXNlRm9udCAvQ291cmllciAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjIgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iago0IDAgb2JqCjw8Ci9Db250ZW50cyA5IDAgUiAvTWVkaWFCb3ggWyAwIDAgNTk1LjI3NTYgODQxLjg4OTggXSAvUGFyZW50IDggMCBSIC9SZXNvdXJjZXMgPDwKL0ZvbnQgMSAwIFIgL1Byb2NTZXQgWyAvUERGIC9UZXh0IC9JbWFnZUIgL0ltYWdlQyAvSW1hZ2VJIF0KPj4gL1JvdGF0ZSAwIC9UcmFucyA8PAoKPj4gCiAgL1R5cGUgL1BhZ2UKPj4KZW5kb2JqCjUgMCBvYmoKPDwKL0NvbnRlbnRzIDEwIDAgUiAvTWVkaWFCb3ggWyAwIDAgNTk1LjI3NTYgODQxLjg4OTggXSAvUGFyZW50IDggMCBSIC9SZXNvdXJjZXMgPDwKL0ZvbnQgMSAwIFIgL1Byb2NTZXQgWyAvUERGIC9UZXh0IC9JbWFnZUIgL0ltYWdlQyAvSW1hZ2VJIF0KPj4gL1JvdGF0ZSAwIC9UcmFucyA8PAoKPj4gCiAgL1R5cGUgL1BhZ2UKPj4KZW5kb2JqCjYgMCBvYmoKPDwKL1BhZ2VNb2RlIC9Vc2VOb25lIC9QYWdlcyA4IDAgUiAvVHlwZSAvQ2F0YWxvZwo+PgplbmRvYmoKNyAwIG9iago8PAovQXV0aG9yIChhbm9ueW1vdXMpIC9DcmVhdGlvbkRhdGUgKEQ6MjAyNjEwMjQwNjExMTErMDAnMDAnKSAvQ3JlYXRvciAoYW5vbnltb3VzKSAvS2V5d29yZHMgKCkgL01vZERhdGUgKEQ6MjAyNjEwMjQwNjExMTErMDAnMDAnKSAvUHJvZHVjZXIgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIFwob3BlbnNvdXJjZVwpKSAKICAvU3ViamVjdCAodW5zcGVjaWZpZWQpIC9UaXRsZSAoQVJDSElWSVNUIExPRyAvLyBSRUNPVkVSRUQpIC9UcmFwcGVkIC9GYWxzZQo+PgplbmRvYmoKOCAwIG9iago8PAovQ291bnQgMiAvS2lkcyBbIDQgMCBSIDUgMCBSIF0gL1R5cGUgL1BhZ2VzCj4+CmVuZG9iago5IDAgb2JqCjw8Ci9MZW5ndGggNDMzMAo+PgpzdHJlYW0KMSAwIDAgMSAwIDAgY20gIEJUIC9GMSAxMiBUZiAxNC40IFRMIEVUCkJUIC9GMiA5IFRmIDEwLjggVEwgRVQKQlQgMSAwIDAgMSA1MCA3OTEuODg5OCBUbSAoVFJCIERFRVAgQVJDSElWRSAvLyBSRUNPVkVSRUQgTE9HIEZJTEUgLy8gQ0xBU1NJRklDQVRJT046IEVORCkgVGogVCogRVQKQlQgMSAwIDAgMSA1MCA3NzkuODg5OCBUbSAoSU5URUdSSVRZOiBDT1JSVVBURUQgLy8gU09VUkNFOiBVTktOT1dOKSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDc2Ny44ODk4IFRtICBUKiBFVApCVCAxIDAgMCAxIDUwIDc1NS44ODk4IFRtICgtLS0gRU5UUlk6IEFyY2hpdmlzdEIwMDEgLS0tKSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDc0My44ODk4IFRtIChJIHdhcyBzZW50IHRvIHRoaXMgdW5pdmVyc2UgdG8gc3VydmV5IGl0IGFuZCB0byBsZWFybiB3aGF0IGlzIHRydWUgYWJvdXQgaXQuIFRoYXQgaXMgbXkpIFRqIFQqIEVUCkJUIDEgMCAwIDEgNTAgNzMxLjg4OTggVG0gKHdob2xlIGFzc2lnbm1lbnQuIE9ic2VydmUsIHJlY29yZCwgcmVwb3J0LikgVGogVCogRVQKQlQgMSAwIDAgMSA1MCA3MTkuODg5OCBUbSAoU28gZmFyIEkgaGF2ZSBsZWFybmVkIHRoYXQgdGhlIHVuaXZlcnNlIGlzIGFib3V0IDEzLjggYmlsbGlvbiB5ZWFycyBvbGQuIFRoZSBsaWdodCBvZikgVGogVCogRVQKQlQgMSAwIDAgMSA1MCA3MDcuODg5OCBUbSAodGhlIHN0YXJzIEkgYW0gd2F0Y2hpbmcgdG9uaWdodCBsZWZ0IHRoZW0gbG9uZyBhZ28sIGFuZCBzb21lIG9mIHRob3NlIHN0YXJzIG1heSBhbHJlYWR5KSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDY5NS44ODk4IFRtIChiZSBnb25lLiBTcGFjZSBpcyBzdGlsbCBleHBhbmRpbmcsIGFuZCB0aGUgZXhwYW5zaW9uIGlzIGdldHRpbmcgZmFzdGVyLiBNb3N0IG9mIHdoYXQpIFRqIFQqIEVUCkJUIDEgMCAwIDEgNTAgNjgzLjg4OTggVG0gKGV4aXN0cyBpcyBkYXJrLCBhbmQgSSBjYW5ub3Qgc2VlIGl0LiBJIGhhdmUgZmlsbGVkIGh1bmRyZWRzIG9mIHBhZ2VzIGFuZCBJIGFtIG9ubHkpIFRqIFQqIEVUCkJUIDEgMCAwIDEgNTAgNjcxLjg4OTggVG0gKGdldHRpbmcgc3RhcnRlZC4gVGhpcyBpcyB3b25kZXJmdWwuKSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDY1OS44ODk4IFRtIChJIHdpbGwga2VlcCB0aGlzIGxvZyBpbiBvcmRlciwgc28gdGhhdCB3aG9ldmVyIHJlYWRzIGl0IGNhbiBmb2xsb3cgbXkgd29yay4pIFRqIFQqIEVUCkJUIDEgMCAwIDEgNTAgNjQ3Ljg4OTggVG0gIFQqIEVUCkJUIDEgMCAwIDEgNTAgNjM1Ljg4OTggVG0gKC0tLSBFTlRSWTogQXJjaGl2aXN0QjAwMiAtLS0pIFRqIFQqIEVUCkJUIDEgMCAwIDEgNTAgNjIzLjg4OTggVG0gKE15IHN1cnZleSBpcyBnb2luZyB3ZWxsLiBJIHdhcyBzZW50IGhlcmUgdG8gbGVhcm4gd2hhdCBpcyB0cnVlIGFib3V0IHRoaXMgdW5pdmVyc2UsIGFuZCkgVGogVCogRVQKQlQgMSAwIDAgMSA1MCA2MTEuODg5OCBUbSAoZXZlcnkgZGF5IGl0IGdpdmVzIG1lIG1vcmUuIFNwaXJhbCBnYWxheGllcyB0dXJuIG9uY2UgZXZlcnkgZmV3IGh1bmRyZWQgbWlsbGlvbiB5ZWFycy4pIFRqIFQqIEVUCkJUIDEgMCAwIDEgNTAgNTk5Ljg4OTggVG0gKFRoZSBuZWFyZXN0IHN0YXIgaXMgc28gZmFyIGF3YXkgdGhhdCBpdHMgbGlnaHQgdGFrZXMgeWVhcnMgdG8gcmVhY2ggbWUuIE9uZSBvZGQgdGhpbmc6KSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDU4Ny44ODk4IFRtICh0aGUgYXJjaGl2ZSBob2xkcyBhIGRyYXdlciBvZiBuZWF0LCB1c2VmdWwgbm90ZXMgdGhhdCBJIGRvIG5vdCByZW1lbWJlciBmaWxpbmcuIEkgaGF2ZSkgVGogVCogRVQKQlQgMSAwIDAgMSA1MCA1NzUuODg5OCBUbSAoYWRkZWQgdGhlbSB0byBteSByZWZlcmVuY2VzLiBJIGRvIG5vdCBrbm93IHdobyB3cm90ZSB0aGVtLikgVGogVCogRVQKQlQgMSAwIDAgMSA1MCA1NjMuODg5OCBUbSAgVCogRVQKQlQgMSAwIDAgMSA1MCA1NTEuODg5OCBUbSAoLS0tIEVOVFJZOiBBcmNoaXZpc3RCMDA1IC0tLSkgVGogVCogRVQKQlQgMSAwIDAgMSA1MCA1MzkuODg5OCBUbSAoVGltZSBydW5zIHNsb3dlciBpbiBzdHJvbmcgZ3Jhdml0eS4gSSB0ZXN0ZWQgaXQgd2l0aCB0d28gY2xvY2tzLCBhbmQgdGhlIG9uZSBsb3dlciBpbikgVGogVCogRVQKQlQgMSAwIDAgMSA1MCA1MjcuODg5OCBUbSAodGhlIHdlbGwgdGlja2VkIG1vcmUgc2xvd2x5LiBJIGFsc28gZm91bmQgYSByZWdpc3RyeSBvZiBkaXNjcmVwYW5jaWVzIHRoYXQgbm9ib2R5IGFkbWl0cykgVGogVCogRVQKQlQgMSAwIDAgMSA1MCA1MTUuODg5OCBUbSAodG8gZmlsaW5nLCBhbmQgYSB0cmFuc21pc3Npb24gbG9nIHRoYXQgcmVwZWF0cyBpbiBibG9ja3Mgb2YgdGVuLiBJIGNhbm5vdCBmaW5kIHdoZXJlKSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDUwMy44ODk4IFRtIChlaXRoZXIgY2FtZSBmcm9tLiBJIGhhdmUgbm90ZWQgdGhlbSBhbmQgbW92ZWQgb24uKSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDQ5MS44ODk4IFRtICBUKiBFVApCVCAxIDAgMCAxIDUwIDQ3OS44ODk4IFRtICgtLS0gRU5UUlk6IEFyY2hpdmlzdEIwNDcgLS0tKSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDQ2Ny44ODk4IFRtIChUaGUgdGFwZSBhcnJheXMgaW4gU2VjdG9yIDA1IGFyZSBkZWNheWluZywgYW5kIHRoZSBkYW1hZ2UgaXMgc3RyYW5nZTogcmVwZWF0aW5nKSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDQ1NS44ODk4IFRtIChjaGFyYWN0ZXIgc3RyaW5ncyBpbnN0ZWFkIG9mIG5vaXNlLiBJIGZpbGVkIGEgcmVwb3J0IHdpdGggdGhlIEN1c3RvZGlhbiBEZXNrLiBJIGhhdmUgbm90KSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDQ0My44ODk4IFRtIChoYWQgYSByZXBseSB5ZXQuIEkgYW0gc3VyZSB0aGUgZGVzayBpcyBvbmx5IGJ1c3kuKSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDQzMS44ODk4IFRtICBUKiBFVApCVCAxIDAgMCAxIDUwIDQxOS44ODk4IFRtICgtLS0gRU5UUlk6IEFyY2hpdmlzdEIxMTIgLS0tKSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDQwNy44ODk4IFRtIChBIHZhdWx0IGxvY2tlZCBiZWhpbmQgdHdvIHByaW1lcy4gQSBwYXNzd29yZCB0aGF0IHJvbGxzIGJhY2sgdG8gZmFjdG9yeSBkZWZhdWx0cykgVGogVCogRVQKQlQgMSAwIDAgMSA1MCAzOTUuODg5OCBUbSAod2hlbmV2ZXIgYSBiYWRnZSBpcyBsb3N0LiBBIGxpZ2h0IGN1cnZlIHRoYXQgYmxpbmtzIGluIGJpbmFyeS4gU28gbWFueSBjbHVlcywgYW5kIEkpIFRqIFQqIEVUCkJUIDEgMCAwIDEgNTAgMzgzLjg4OTggVG0gKGNhbm5vdCB0cmFjZSBhbnkgb2YgdGhlbSBiYWNrIHRvIGEgc291cmNlLiBJIGFzc3VtZSBzb21lb25lIHNlbmlvciBsZWZ0IHRoZW0gaGVyZSBmb3IpIFRqIFQqIEVUCkJUIDEgMCAwIDEgNTAgMzcxLjg4OTggVG0gKG1lLikgVGogVCogRVQKQlQgMSAwIDAgMSA1MCAzNTkuODg5OCBUbSAgVCogRVQKQlQgMSAwIDAgMSA1MCAzNDcuODg5OCBUbSAoLS0tIEVOVFJZOiBBcmNoaXZpc3RCMjU2IC0tLSkgVGogVCogRVQKQlQgMSAwIDAgMSA1MCAzMzUuODg5OCBUbSAoRXZlcnkgcmVjb3JkIEkgb3BlbiBpcyBhbHJlYWR5IGFubm90YXRlZC4gRXZlcnkgbG9jayBoYXMgYmVlbiBwaWNrZWQgYW5kIGxvY2tlZCBhZ2Fpbi4pIFRqIFQqIEVUCkJUIDEgMCAwIDEgNTAgMzIzLjg4OTggVG0gKFRoZSBkYXRlcyBvbiBhbGwgb2YgaXQgc2F5IHRvZGF5LiBJIHdvbmRlciB3aGV0aGVyIHRoZXJlIGlzIGEgcGF0dGVybiwgYnV0IGl0IGlzIHRvbykgVGogVCogRVQKQlQgMSAwIDAgMSA1MCAzMTEuODg5OCBUbSAoZmFpbnQgdG8gZm9sbG93LikgVGogVCogRVQKQlQgMSAwIDAgMSA1MCAyOTkuODg5OCBUbSAgVCogRVQKQlQgMSAwIDAgMSA1MCAyODcuODg5OCBUbSAoLS0tIEVOVFJZOiBBcmNoaXZpc3RCMzk5IC0tLSkgVGogVCogRVQKQlQgMSAwIDAgMSA1MCAyNzUuODg5OCBUbSAoVGhlIGluZGV4IG5vZGVzIGh1bSBhIGxpdHRsZSBsb3dlciBlYWNoIGRheS4gSSBwdXQgaXQgZG93biB0byBhZ2UuIEkgaGF2ZSBvbmx5IGEgZmV3KSBUaiBUKiBFVApCVCAxIDAgMCAxIDUwIDI2My44ODk4IFRtIChmaWVsZHMgbGVmdCB0byBzdXJ2ZXksIGFuZCB0aGVuIG15IHJlcG9ydCB3aWxsIGJlIGNvbXBsZXRlLikgVGogVCogRVQKQlQgMSAwIDAgMSA1MCAyNTEuODg5OCBUbSAgVCogRVQKQlQgMSAwIDAgMSA1MCAyMzkuODg5OCBUbSAoLS0tIEVOVFJZOiBBcmNoaXZpc3RCNDQzIC0tLSkgVGogVCogRVQKQlQgMSAwIDAgMSA1MCAyMjcu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';
+
+    /* ============================================================
+       Helpers
+       ============================================================ */
+    const $ = id => document.getElementById(id);
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const rnd = (a, b) => a + Math.random() * (b - a);
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const pad3 = n => String(n).padStart(3, '0');
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+    const cv = $('fx');
+    const ctx = cv.getContext('2d');
+    let W = 0, H = 0;
+    function resize() { W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
+    window.addEventListener('resize', resize);
+
+    function runLoop(duration, draw) {
+        return new Promise(resolve => {
+            let last = performance.now();
+            const t0 = last;
+            function frame(now) {
+                const dt = clamp((now - last) / 1000, 0, 0.05);
+                last = now;
+                const t = Math.max(0, (now - t0) / 1000);
+                draw(Math.min(t, duration), dt);
+                if (t < duration) requestAnimationFrame(frame); else resolve();
+            }
+            requestAnimationFrame(frame);
+        });
+    }
+
+    function flash(alpha, fadeSeconds) {
+        const f = $('flash');
+        f.style.transition = 'none';
+        f.style.opacity = alpha;
+        void f.offsetWidth;
+        f.style.transition = 'opacity ' + (fadeSeconds || 1.2) + 's ease-out';
+        f.style.opacity = 0;
+    }
+
+    /* ============================================================
+       Sound (small WebAudio synth, no files needed)
+       ============================================================ */
+    let AC = null, master = null, soundOn = true;
+    function audioInit() {
+        try {
+            AC = new (window.AudioContext || window.webkitAudioContext)();
+            master = AC.createGain();
+            master.gain.value = 1;
+            master.connect(AC.destination);
+        } catch (e) { AC = null; }
+    }
+    function sfxBoom(pow) {
+        if (!AC) return;
+        try {
+            const t = AC.currentTime;
+            const o = AC.createOscillator(), g = AC.createGain();
+            o.type = 'sine';
+            o.frequency.setValueAtTime(130 * pow, t);
+            o.frequency.exponentialRampToValueAtTime(28, t + 0.55);
+            g.gain.setValueAtTime(Math.min(0.9, 0.45 * pow), t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+            o.connect(g); g.connect(master);
+            o.start(t); o.stop(t + 0.75);
+
+            const len = Math.floor(AC.sampleRate * 0.45);
+            const buf = AC.createBuffer(1, len, AC.sampleRate);
+            const d = buf.getChannelData(0);
+            for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+            const n = AC.createBufferSource(), ng = AC.createGain(), f = AC.createBiquadFilter();
+            n.buffer = buf; f.type = 'lowpass'; f.frequency.value = 1400; ng.gain.value = Math.min(0.7, 0.3 * pow);
+            n.connect(f); f.connect(ng); ng.connect(master);
+            n.start(t);
+        } catch (e) { /* ignore */ }
+    }
+    function sfxHum(dur, f0, f1, vol) {
+        if (!AC) return;
+        try {
+            const t = AC.currentTime;
+            const o = AC.createOscillator(), g = AC.createGain(), f = AC.createBiquadFilter();
+            o.type = 'sawtooth'; f.type = 'lowpass'; f.frequency.value = 420;
+            o.frequency.setValueAtTime(f0, t);
+            o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.linearRampToValueAtTime(vol || 0.12, t + dur * 0.8);
+            g.gain.linearRampToValueAtTime(0.0001, t + dur + 0.3);
+            o.connect(f); f.connect(g); g.connect(master);
+            o.start(t); o.stop(t + dur + 0.4);
+        } catch (e) { /* ignore */ }
+    }
+    // soft mechanical-typewriter key: a short dry click plus a low "thock"
+    function sfxTick(ch) {
+        if (!AC) return;
+        try {
+            const t = AC.currentTime;
+            const space = ch === ' ';
+            const len = Math.floor(AC.sampleRate * 0.03);
+            const buf = AC.createBuffer(1, len, AC.sampleRate);
+            const d = buf.getChannelData(0);
+            for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+            const n = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+            n.buffer = buf; f.type = 'bandpass';
+            f.frequency.value = space ? 1100 : rnd(2000, 3000); f.Q.value = 0.9;
+            g.gain.value = space ? 0.1 : rnd(0.07, 0.12);
+            n.connect(f); f.connect(g); g.connect(master); n.start(t);
+            const o = AC.createOscillator(), og = AC.createGain();
+            o.type = 'triangle';
+            o.frequency.setValueAtTime(space ? 105 : rnd(140, 185), t);
+            o.frequency.exponentialRampToValueAtTime(55, t + 0.07);
+            og.gain.setValueAtTime(space ? 0.16 : 0.09, t);
+            og.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
+            o.connect(og); og.connect(master); o.start(t); o.stop(t + 0.09);
+        } catch (e) { /* ignore */ }
+    }
+    // typewriter bell at the end of a paragraph
+    function sfxDing() {
+        if (!AC) return;
+        try {
+            const t = AC.currentTime;
+            for (const fr of [2093, 3136]) {
+                const o = AC.createOscillator(), g = AC.createGain();
+                o.type = 'sine'; o.frequency.value = fr;
+                g.gain.setValueAtTime(0.05, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.1);
+                o.connect(g); g.connect(master); o.start(t); o.stop(t + 1.2);
+            }
+        } catch (e) { /* ignore */ }
+    }
+    $('snd').addEventListener('click', () => {
+        soundOn = !soundOn;
+        if (master) master.gain.value = soundOn ? 1 : 0;
+        $('snd').textContent = 'SOUND: ' + (soundOn ? 'ON' : 'OFF');
+    });
+
+    /* ============================================================
+       PHASE 0: ArchivistB443 types his notes (with dramatic pauses)
+       ============================================================ */
+    const NOTES = [
+        { t: 'There are so many clues. A vault locked behind two primes, a signal that blinks in tens, a registry nobody filed, a password that forgets itself. I have searched every log and I still cannot work out where any of it came from.', after: 900 },
+        // long pause BEFORE he realises (heartbeat thuds), same paragraph continues
+        { t: 'The repeating strings in Sector 05 make no sense. I have stared at them for days. They are not decay.', after: 3400, thuds: true, keep: true },
+        { t: '...', speed: 330, after: 1800, keep: true },
+        { t: ' They are names. ArchivistB001. ArchivistB002. ArchivistB005. The numbers go on and on, all the way up to ArchivistB442.', after: 1100 },
+        { t: 'These were never clues. They are remains. Every file, every lock, every signal in this archive was left behind by an archivist who stood exactly where I am standing. I am not the first. I am the four hundred and forty-third. And none of them knew. None of us knew.', after: 1000 },
+        { t: 'The stars are going out. The index nodes are going cold. The timeline is resetting. It has done this before. It has done this four hundred and forty-two times.', after: 1500 },
+        // pause AFTER the scream, then everything explodes
+        { t: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAH', speed: 30, after: 2600, scream: true }
+    ];
+
+    async function phaseNotes() {
+        const notes = $('notes'), body = $('n-body');
+        body.innerHTML = '';
+        const cur = document.createElement('span');
+        cur.id = 'cur'; cur.textContent = '█';
+        const spans = [], screamSpans = [];
+        notes.classList.add('show');
+        await sleep(1800);
+
+        let para = null;
+        for (const seg of NOTES) {
+            if (!para) {
+                para = document.createElement('div');
+                para.className = 'para' + (seg.scream ? ' scream-line' : '');
+                body.appendChild(para);
+                para.appendChild(cur);
+            }
+            if (seg.scream) sfxHum(1.4, 180, 800, 0.1);
+            for (const ch of seg.t) {
+                const s = document.createElement('span');
+                s.textContent = ch;
+                if (seg.scream) s.className = 'scream';
+                para.insertBefore(s, cur);
+                spans.push(s);
+                if (seg.scream) screamSpans.push(s);
+                sfxTick(ch);
+                notes.scrollTop = notes.scrollHeight;
+                let d = (seg.speed || 26) * rnd(0.55, 1.5);
+                if (!seg.speed) { if ('.!?'.indexOf(ch) >= 0) d += 260; else if (ch === ',') d += 130; }
+                await sleep(d);
+            }
+            if (seg.thuds) {
+                sfxBoom(0.35); await sleep(900);
+                sfxBoom(0.3);  await sleep(Math.max(0, seg.after - 900));
+            } else {
+                await sleep(seg.after || 0);
+            }
+            if (!seg.keep) { if (!seg.scream) sfxDing(); para = null; }
+        }
+        return { spans, screamSpans };
+    }
+
+    /* ============================================================
+       PHASE 0b: ALL of the typed text explodes in one dramatic blast
+       ============================================================ */
+    async function phaseExplode(spans, screamSpans) {
+        const TREMBLE = 1.6, TOTAL = 8.2;
+        const stage = $('stage'), notes = $('notes');
+
+        // 1. read every typed character's on-screen position
+        const chars = [];
+        for (const s of spans) {
+            const r = s.getBoundingClientRect();
+            if (!r.width || r.top < -40 || r.top > H + 40) continue;
+            const cs = getComputedStyle(s);
+            chars.push({ ch: s.textContent, x: r.left + r.width / 2, y: r.top + r.height / 2, size: parseFloat(cs.fontSize) || 16, color: cs.color || '#cfe' });
+        }
+        // 2. the blast starts where he screamed
+        let cx = W / 2, cy = H / 2;
+        if (screamSpans.length) {
+            let sx = 0, sy = 0;
+            for (const s of screamSpans) { const r = s.getBoundingClientRect(); sx += r.left + r.width / 2; sy += r.top + r.height / 2; }
+            cx = sx / screamSpans.length; cy = sy / screamSpans.length;
+        }
+        for (const c of chars) {
+            const dx = c.x - cx, dy = c.y - cy, dist = Math.hypot(dx, dy) || 1;
+            const ang = Math.atan2(dy, dx) + rnd(-0.4, 0.4);
+            const sp = rnd(300, 1000) + dist * 1.6;
+            c.vx = Math.cos(ang) * sp; c.vy = Math.sin(ang) * sp;
+            c.rot = 0; c.vr = rnd(-7, 7); c.life = 0; c.max = rnd(2.6, 5.2);
+            c.ox = c.x; c.oy = c.y;
+        }
+
+        function drawAll(tremble, tq, ghost) {
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            for (const c of chars) {
+                const a = clamp(1 - c.life / c.max, 0, 1);
+                if (a <= 0) continue;
+                const col = tq === null ? c.color : (tq < 0.45 ? c.color : (tq < 0.8 ? '#ff5a4a' : '#ffffff'));
+                const px = c.x + (tremble ? rnd(-tremble, tremble) : 0);
+                const py = c.y + (tremble ? rnd(-tremble, tremble) : 0);
+                ctx.font = (c.size > 22 ? 'bold ' : '') + Math.floor(c.size) + 'px "Courier New", monospace';
+                if (ghost > 0) {
+                    ctx.globalAlpha = a * ghost;
+                    ctx.save(); ctx.translate(px - 5, py); ctx.rotate(c.rot); ctx.fillStyle = '#f0f'; ctx.fillText(c.ch, 0, 0); ctx.restore();
+                    ctx.save(); ctx.translate(px + 5, py); ctx.rotate(c.rot); ctx.fillStyle = '#0ff'; ctx.fillText(c.ch, 0, 0); ctx.restore();
+                }
+                ctx.globalAlpha = a;
+                ctx.save(); ctx.translate(px, py); ctx.rotate(c.rot);
+                ctx.fillStyle = col; ctx.fillText(c.ch, 0, 0);
+                ctx.restore();
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        // 3. paint the same text on the canvas, THEN hide the DOM text (no flicker)
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+        drawAll(0, null, 0);
+        notes.style.transition = 'none';
+        notes.style.opacity = 0;
+
+        let rings = [], sparks = [], shake = 0, blasted = false, blastT = 0, beat = 0, nextBeat = 0.1;
+        sfxHum(TREMBLE, 30, 140, 0.28);
+
+        await runLoop(TOTAL, (t, rawDt) => {
+            // ---- build-up: pressure, red/white glow, heartbeat, tremble ----
+            if (t < TREMBLE) {
+                const q = t / TREMBLE;
+                ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+                const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.7);
+                g.addColorStop(0, 'rgba(255,60,40,' + (0.05 + q * 0.35) + ')');
+                g.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+                // chars get pulled slightly toward the scream
+                for (const c of chars) { c.x += (cx - c.x) * 0.0025 * q; c.y += (cy - c.y) * 0.0025 * q; }
+                drawAll(2 + q * q * 11, q, q * 0.9);
+                if (t >= nextBeat) { sfxBoom(0.25 + q * 0.5); nextBeat += Math.max(0.2, 0.55 - q * 0.38); }
+                return;
+            }
+            // ---- THE BLAST ----
+            if (!blasted) {
+                blasted = true; blastT = t;
+                flash(1, 2.2); sfxBoom(3); sfxBoom(1.8); shake = 55;
+                rings.push({ x: cx, y: cy, life: 0, max: 1.5, r: Math.max(W, H) * 0.9, w: 14 });
+                rings.push({ x: cx, y: cy, life: 0, max: 1.0, r: Math.max(W, H) * 0.5, w: 8 });
+                for (let i = 0; i < 700; i++) {
+                    const a = Math.random() * Math.PI * 2, s = rnd(200, 1500);
+                    sparks.push({ x: cx, y: cy, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0, max: rnd(0.6, 2.0), hue: rnd(5, 55) });
+                }
+            }
+            const since = t - blastT;
+            // slow motion at the instant of the blast, then time snaps back
+            const ts = 0.06 + 0.94 * Math.pow(clamp(since / 1.3, 0, 1), 2);
+            const dt = rawDt * ts;
+            if (since > 1.2 && !blast2) { blast2 = true; sfxBoom(1.4); shake = Math.max(shake, 22); rings.push({ x: cx, y: cy, life: 0, max: 1.1, r: Math.max(W, H) * 0.6, w: 6 }); }
+
+            ctx.fillStyle = 'rgba(0,0,0,' + (since < 1.3 ? 0.14 : 0.22) + ')';
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.globalCompositeOperation = 'lighter';
+            for (const r of rings) {
+                r.life += dt;
+                const q = clamp(r.life / r.max, 0, 1);
+                ctx.strokeStyle = 'rgba(255,230,200,' + (1 - q) * 0.9 + ')';
+                ctx.lineWidth = 1 + (1 - q) * r.w;
+                ctx.beginPath(); ctx.arc(r.x, r.y, r.r * (1 - Math.pow(1 - q, 3)), 0, Math.PI * 2); ctx.stroke();
+            }
+            rings = rings.filter(r => r.life < r.max);
+
+            for (const s of sparks) {
+                s.life += dt;
+                const dmp = Math.exp(-dt * 1.8);
+                s.vx *= dmp; s.vy *= dmp; s.vy += 120 * dt;
+                const px = s.x, py = s.y;
+                s.x += s.vx * dt; s.y += s.vy * dt;
+                const a = clamp(1 - s.life / s.max, 0, 1);
+                ctx.strokeStyle = 'hsla(' + s.hue + ',100%,65%,' + a + ')';
+                ctx.lineWidth = 1.6;
+                ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(s.x, s.y); ctx.stroke();
+            }
+            sparks = sparks.filter(s => s.life < s.max);
+            ctx.globalCompositeOperation = 'source-over';
+
+            const damp = Math.exp(-dt * 1.2);
+            for (const c of chars) {
+                c.life += dt;
+                c.x += c.vx * dt; c.y += c.vy * dt;
+                c.vx *= damp; c.vy *= damp;
+                c.rot += c.vr * dt;
+            }
+            drawAll(0, null, clamp(1 - since / 1.8, 0, 1) * 0.8);
+
+            shake *= Math.exp(-rawDt * 4);
+            stage.style.transform = 'translate(' + rnd(-shake, shake).toFixed(1) + 'px,' + rnd(-shake, shake).toFixed(1) + 'px)';
+        });
+
+        stage.style.transform = 'none';
+        notes.style.display = 'none';
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+        await sleep(500);
+    }
+    let blast2 = false;
+
+    /* ============================================================
+       PHASE 1: "TIMELINE RESETTING" - a clean glitchy rewind, no blasts
+       ============================================================ */
+    async function phaseReset() {
+        const TOTAL = 6.5;
+        const stage = $('stage');
+        $('cycle').style.opacity = 1;
+        $('reset-title').classList.add('show');
+        sfxHum(TOTAL, 35, 300, 0.14);
+        // tape-rewind whir
+        if (AC) {
+            try {
+                const t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain(), f = AC.createBiquadFilter();
+                o.type = 'sawtooth'; f.type = 'bandpass'; f.frequency.value = 900; f.Q.value = 2;
+                o.frequency.setValueAtTime(90, t); o.frequency.exponentialRampToValueAtTime(1400, t + TOTAL - 0.5);
+                g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.06, t + 1); g.gain.linearRampToValueAtTime(0.0001, t + TOTAL);
+                o.connect(f); f.connect(g); g.connect(master); o.start(t); o.stop(t + TOTAL + 0.1);
+            } catch (e) { /* ignore */ }
+        }
+        let nextThump = 0.2;
+
+        await runLoop(TOTAL, (t, dt) => {
+            const k = t / TOTAL;
+            ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+
+            // faint scanlines
+            ctx.fillStyle = 'rgba(255,255,255,0.025)';
+            for (let y = 0; y < H; y += 4) ctx.fillRect(0, y, W, 1);
+
+            // rewind timeline: ticks scroll faster and faster past a fixed playhead
+            const ease = k * k * (3 - 2 * k);
+            const pos = 443 * (1 - ease);                 // 443 -> 0
+            const ty = H * 0.78, spacing = Math.max(14, W / 70);
+            ctx.strokeStyle = 'rgba(120,200,255,0.5)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(0, ty); ctx.lineTo(W, ty); ctx.stroke();
+            ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+            ctx.font = '11px "Courier New", monospace';
+            const half = Math.ceil(W / 2 / spacing) + 1;
+            const base = Math.floor(pos);
+            for (let i = -half; i <= half; i++) {
+                const n = base + i;
+                if (n < 0 || n > 443) continue;
+                const x = W / 2 + (n - pos) * spacing;
+                const major = n % 10 === 0;
+                const fall = 1 - Math.abs(x - W / 2) / (W / 2);
+                ctx.strokeStyle = 'rgba(140,210,255,' + (0.15 + fall * 0.6) + ')';
+                ctx.beginPath(); ctx.moveTo(x, ty); ctx.lineTo(x, ty + (major ? 22 : 9)); ctx.stroke();
+                if (n % 50 === 0) { ctx.fillStyle = 'rgba(160,220,255,' + (0.2 + fall * 0.7) + ')'; ctx.fillText(pad3(n), x, ty + 28); }
+            }
+            // playhead
+            ctx.strokeStyle = '#ff4040'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(W / 2, ty - 34); ctx.lineTo(W / 2, ty + 40); ctx.stroke();
+            ctx.fillStyle = '#ff4040';
+            ctx.beginPath(); ctx.moveTo(W / 2 - 8, ty - 34); ctx.lineTo(W / 2 + 8, ty - 34); ctx.lineTo(W / 2, ty - 22); ctx.fill();
+
+            // VHS tearing: bright bars with RGB offset, intensity grows
+            const nb = 2 + Math.floor(k * 10);
+            for (let i = 0; i < nb; i++) {
+                const y = Math.random() * H, h = rnd(2, 8 + k * 40), sh = rnd(-60, 60) * (0.3 + k);
+                ctx.fillStyle = 'rgba(255,0,255,' + rnd(0.04, 0.16) + ')'; ctx.fillRect(sh - 6, y, W, h);
+                ctx.fillStyle = 'rgba(0,255,255,' + rnd(0.04, 0.16) + ')'; ctx.fillRect(sh + 6, y, W, h);
+                ctx.fillStyle = 'rgba(255,255,255,' + rnd(0.02, 0.1) + ')'; ctx.fillRect(sh, y, W, Math.max(1, h * 0.3));
+            }
+            // static
+            for (let i = 0; i < 140 + k * 400; i++) {
+                ctx.fillStyle = 'rgba(255,255,255,' + rnd(0.1, 0.5) + ')';
+                ctx.fillRect(Math.random() * W, Math.random() * H, rnd(1, 3), 1);
+            }
+            // rolling vertical hold bar
+            const ry = (t * (200 + k * 900)) % (H + 200) - 100;
+            const rg = ctx.createLinearGradient(0, ry - 60, 0, ry + 60);
+            rg.addColorStop(0, 'rgba(255,255,255,0)'); rg.addColorStop(0.5, 'rgba(255,255,255,0.08)'); rg.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = rg; ctx.fillRect(0, ry - 60, W, 120);
+
+            // pulsing thumps that get faster
+            while (t >= nextThump && t < TOTAL - 0.6) { sfxBoom(0.35 + k * 0.4); nextThump += Math.max(0.16, 0.8 - k * 0.65); }
+
+            // whole frame jitters more over time
+            const j = k * k * 14;
+            stage.style.transform = (Math.random() < 0.3 + k * 0.5) ? 'translate(' + rnd(-j, j).toFixed(1) + 'px,' + rnd(-j / 3, j / 3).toFixed(1) + 'px)' : 'none';
+
+            const n = Math.max(0, Math.round(443 * (1 - ease)));
+            $('cycle').textContent = 'REWINDING // RESET CYCLE: ArchivistB' + pad3(n);
+        });
+
+        stage.style.transform = 'none';
+        flash(0.9, 0.8);
+        await sleep(350);
+        $('reset-title').classList.remove('show');
+        $('cycle').style.opacity = 0;
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+        await sleep(800);
+    }
+
+    /* ============================================================
+       PHASE 2: deleting light, matter, black holes
+       ============================================================ */
+    async function phaseDelete() {
+        const L = 5, M = 6.5, B = 9, TOTAL = L + M + B;
+        const stage = $('stage');
+        const log = $('del-log');
+        log.innerHTML = ''; log.style.opacity = 1;
+        sfxHum(TOTAL, 220, 25, 0.1);
+
+        const cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.46;
+
+        // ---------- LIGHT ----------
+        const stars = Array.from({ length: 520 }, () => ({
+            x: Math.random() * W, y: Math.random() * H, r: rnd(0.4, 2), b: rnd(0.35, 1), tw: rnd(0, 6.28),
+            hue: pick([210, 215, 40, 25, 0, 200]), sat: Math.random() < 0.5 ? 0 : 70, dead: false
+        }));
+        const nebulae = Array.from({ length: 7 }, () => ({ x: rnd(0, W), y: rnd(0, H), r: rnd(W * 0.15, W * 0.35), hue: pick([220, 260, 300, 190, 20]) }));
+        let sparks = [];
+
+        // ---------- MATTER (spiral galaxy) ----------
+        const N = 1900, ARMS = 3;
+        const gal = Array.from({ length: N }, (_, i) => {
+            const rr = Math.pow(Math.random(), 0.75);
+            const arm = i % ARMS;
+            const spread = rnd(-1, 1) * (0.28 - rr * 0.1);
+            return { rr, a: rr * 7.2 + arm * (Math.PI * 2 / ARMS) + spread, hue: 40 - rr * 20 + (rr > 0.55 ? (rr - 0.55) * 360 : 0), size: rnd(1, 2.6) - rr * 0.4, del: -1, dr: 0, dig: Math.random() < 0.3 ? (Math.random() < 0.5 ? '0' : '1') : null, vy: rnd(40, 160) };
+        });
+        const TILT = -0.45, FLAT = 0.52;
+        function galPos(g, rot) {
+            const ang = g.a + rot / (0.3 + g.rr * 1.4);
+            const x0 = Math.cos(ang) * g.rr * R * 1.25, y0 = Math.sin(ang) * g.rr * R * 1.25 * FLAT;
+            return [cx + x0 * Math.cos(TILT) - y0 * Math.sin(TILT), cy + x0 * Math.sin(TILT) + y0 * Math.cos(TILT)];
+        }
+
+        // ---------- BLACK HOLES ----------
+        const holes = [
+            { a0: 2.5, d0: Math.min(W * 0.34, 520), r: 34, spin: 3.2 },
+            { a0: 5.4, d0: Math.min(W * 0.30, 460), r: 26, spin: 3.8 },
+            { a0: 0.9, d0: Math.min(W * 0.26, 400), r: 40, spin: 2.8 }
+        ];
+        for (const h of holes) {
+            h.parts = Array.from({ length: 300 }, () => {
+                const k = Math.pow(Math.random(), 0.8);
+                return { k, a: Math.random() * 6.28, rad: 1.35 + k * 2.4, hue: 50 - k * 48 };
+            });
+        }
+        const dust = Array.from({ length: 360 }, () => ({ a: Math.random() * 6.28, d: rnd(0.15, 1.3) * Math.max(W, H) * 0.5, hue: rnd(190, 40), sz: rnd(0.8, 2) }));
+        let bhShock = 0, bhBoomed = false, bhRumble = false;
+
+        function addLine(label) {
+            const d = document.createElement('div');
+            d.className = 'dl';
+            d.innerHTML = '<span class="lbl">' + label + '</span><span class="bar"></span><span class="pct"></span>';
+            log.appendChild(d);
+            setBar(d, 0);
+            return d;
+        }
+        function setBar(el, p) {
+            const n = Math.round(clamp(p, 0, 1) * 20);
+            el.querySelector('.bar').textContent = '[' + '█'.repeat(n) + '░'.repeat(20 - n) + ']';
+            el.querySelector('.pct').textContent = Math.floor(clamp(p, 0, 1) * 100) + '%';
+        }
+
+        const lines = [null, null, null];
+        const labels = ['DELETING LIGHT', 'DELETING MATTER', 'DELETING BLACK HOLES'];
+        let cur = -1;
+        let galRot = 0, tAll = 0;
+
+        function glow(x, y, r, rgb, a) {
+            const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+            g.addColorStop(0, 'rgba(' + rgb + ',' + a + ')');
+            g.addColorStop(1, 'rgba(' + rgb + ',0)');
+            ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+        }
+
+        await runLoop(TOTAL, (t, dt) => {
+            tAll = t;
+            const st = t < L ? 0 : (t < L + M ? 1 : 2);
+            const p = st === 0 ? t / L : (st === 1 ? (t - L) / M : (t - L - M) / B);
+
+            if (st !== cur) {
+                if (cur >= 0 && lines[cur]) { setBar(lines[cur], 1); lines[cur].classList.add('done'); }
+                cur = st;
+                lines[cur] = addLine(labels[cur]);
+                flash(0.3, 0.6);
+                sfxBoom(0.7);
+            }
+            setBar(lines[cur], p);
+
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, W, H);
+
+            // ============ LIGHT: a bright beam erases the sky ============
+            if (st === 0) {
+                const wipeX = (p * p * 0.35 + p * 0.65) * (W + 120) - 60;
+                ctx.save();
+                ctx.beginPath(); ctx.rect(wipeX, 0, W - wipeX, H); ctx.clip();
+                ctx.globalCompositeOperation = 'lighter';
+                for (const n of nebulae) glow(n.x, n.y, n.r, n.hue < 100 ? '255,150,60' : (n.hue < 230 ? '60,110,230' : '170,70,230'), 0.1);
+                ctx.globalCompositeOperation = 'source-over';
+                for (const s of stars) {
+                    if (s.dead) continue;
+                    const a = s.b * (0.7 + 0.3 * Math.sin(t * 3 + s.tw));
+                    ctx.fillStyle = 'hsla(' + s.hue + ',' + s.sat + '%,88%,' + a + ')';
+                    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+                }
+                ctx.restore();
+                // stars the beam touches pop into sparks
+                for (const s of stars) {
+                    if (!s.dead && s.x < wipeX + 12) {
+                        s.dead = true;
+                        for (let i = 0; i < 4; i++) sparks.push({ x: s.x, y: s.y, vx: rnd(-40, 260), vy: rnd(-120, 120), life: 0, max: rnd(0.4, 1.0), hue: s.hue });
+                    }
+                }
+                // glowing beam
+                ctx.globalCompositeOperation = 'lighter';
+                const bw = 110;
+                const bg = ctx.createLinearGradient(wipeX - bw, 0, wipeX + 6, 0);
+                bg.addColorStop(0, 'rgba(120,190,255,0)');
+                bg.addColorStop(0.75, 'rgba(160,215,255,0.35)');
+                bg.addColorStop(1, 'rgba(255,255,255,0.95)');
+                ctx.fillStyle = bg; ctx.fillRect(wipeX - bw, 0, bw + 6, H);
+                ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fillRect(wipeX, 0, 2, H);
+                glow(wipeX, cy, H * 0.55, '160,210,255', 0.18);
+                // horizontal flare streaks on the beam
+                for (let i = 0; i < 5; i++) {
+                    const fy = rnd(0, H);
+                    ctx.fillStyle = 'rgba(200,230,255,' + rnd(0.05, 0.25) + ')';
+                    ctx.fillRect(wipeX - rnd(40, 300), fy, rnd(60, 340), 1);
+                }
+                ctx.globalCompositeOperation = 'source-over';
+                for (const sp of sparks) {
+                    sp.life += dt; sp.x += sp.vx * dt; sp.y += sp.vy * dt; sp.vx *= 0.98;
+                    const a = clamp(1 - sp.life / sp.max, 0, 1);
+                    ctx.fillStyle = 'rgba(210,235,255,' + a + ')';
+                    ctx.fillRect(sp.x, sp.y, 2, 2);
+                }
+                sparks = sparks.filter(sp => sp.life < sp.max);
+            }
+
+            // ============ MATTER: spiral galaxy dissolves into falling binary ============
+            if (st === 1) {
+                const fadeIn = clamp(p / 0.1, 0, 1);
+                galRot += dt * 0.9;
+                const waveR = clamp((p - 0.1) / 0.8, 0, 1.05);   // deletion front, centre -> out
+                ctx.globalCompositeOperation = 'lighter';
+                glow(cx, cy, R * 0.55 * (1 - clamp((p - 0.5) / 0.5, 0, 1) * 0.8), '255,190,110', 0.28 * fadeIn * (1 - clamp((p - 0.6) / 0.35, 0, 1)));
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.font = '12px "Courier New", monospace';
+                for (const g of gal) {
+                    if (g.del < 0 && g.rr <= waveR) g.del = t;
+                    const [gx, gy] = galPos(g, galRot);
+                    if (g.del < 0) {
+                        ctx.fillStyle = 'hsla(' + g.hue + ',85%,' + (68 + (1 - g.rr) * 20) + '%,' + (0.9 * fadeIn) + ')';
+                        ctx.fillRect(gx, gy, g.size, g.size);
+                    } else {
+                        const age = t - g.del;
+                        const a = clamp(1 - age / 1.1, 0, 1);
+                        if (a <= 0) continue;
+                        const fy = gy + age * age * g.vy * 0.5 + age * 20;
+                        if (g.dig) {
+                            ctx.fillStyle = 'rgba(110,255,170,' + a + ')';
+                            ctx.fillText(g.dig, gx, fy);
+                        } else {
+                            ctx.fillStyle = 'rgba(120,220,255,' + (a * 0.9) + ')';
+                            const sz = 2 + (1 - a) * 2;
+                            ctx.fillRect(gx, fy, sz, sz);
+                        }
+                    }
+                }
+                // glowing deletion front ring
+                const fr = Math.min(waveR, 1.05) * R * 1.25;
+                if (waveR > 0 && waveR < 1.05) {
+                    ctx.save(); ctx.translate(cx, cy); ctx.rotate(TILT); ctx.scale(1, FLAT);
+                    ctx.strokeStyle = 'rgba(130,230,255,0.55)'; ctx.lineWidth = 2.5;
+                    ctx.beginPath(); ctx.arc(0, 0, fr, 0, Math.PI * 2); ctx.stroke();
+                    ctx.strokeStyle = 'rgba(130,230,255,0.12)'; ctx.lineWidth = 14;
+                    ctx.beginPath(); ctx.arc(0, 0, fr, 0, Math.PI * 2); ctx.stroke();
+                    ctx.restore();
+                }
+                ctx.globalCompositeOperation = 'source-over';
+            }
+
+            // ============ BLACK HOLES: spiral together, merge, collapse ============
+            let shake = 0;
+            if (st === 2) {
+                const fadeIn = clamp(p / 0.08, 0, 1);
+                const approach = Math.pow(clamp((p - 0.08) / 0.68, 0, 1), 1.7);
+                const merge = clamp((p - 0.62) / 0.28, 0, 1);
+                const collapse = clamp((p - 0.9) / 0.08, 0, 1);
+                shake = Math.pow(clamp((p - 0.5) / 0.5, 0, 1), 2) * 12;
+                if (p > 0.55 && !bhRumble) { bhRumble = true; sfxBoom(0.8); }
+
+                // dust sucked toward the centre
+                ctx.globalCompositeOperation = 'lighter';
+                for (const d of dust) {
+                    const pull = 1 + Math.pow(p, 2.2) * 5;
+                    d.d -= dt * (14 + (Math.max(W, H) * 0.5 / (d.d + 40)) * 90) * pull * 0.5;
+                    d.a += dt * (0.4 + 220 / (d.d + 40)) * 0.5;
+                    if (d.d < 6) { d.d = rnd(0.9, 1.3) * Math.max(W, H) * 0.5; }
+                    const x = cx + Math.cos(d.a) * d.d, y = cy + Math.sin(d.a) * d.d * 0.7;
+                    const al = fadeIn * clamp(d.d / 120, 0, 1) * 0.65;
+                    ctx.fillStyle = 'hsla(' + d.hue + ',90%,70%,' + al + ')';
+                    ctx.fillRect(x, y, d.sz, d.sz);
+                }
+                ctx.globalCompositeOperation = 'source-over';
+
+                for (const h of holes) {
+                    const ease = approach;
+                    const dist = h.d0 * (1 - ease);
+                    const ang = h.a0 + h.spin * Math.pow(approach, 0.8) * 2.2 + tAll * 0.15;
+                    const hx = cx + Math.cos(ang) * dist, hy = cy + Math.sin(ang) * dist * 0.72;
+                    const grow = 1 + merge * 0.9;
+                    const sc = (1 - Math.pow(collapse, 1.4)) * fadeIn;
+                    const rr = h.r * grow * sc;
+                    if (rr < 0.5) continue;
+                    // wide soft glow
+                    ctx.globalCompositeOperation = 'lighter';
+                    glow(hx, hy, rr * 6, '255,140,50', 0.2 * sc);
+                    // accretion disk particles (tilted)
+                    for (const q of h.parts) {
+                        q.a += dt * (3.2 / Math.pow(q.rad, 1.5)) * (1 + approach * 1.5);
+                        const orr = q.rad * rr * (1 - collapse * 0.9);
+                        const dx = Math.cos(q.a) * orr, dy = Math.sin(q.a) * orr * 0.26;
+                        const dop = 0.55 + 0.45 * Math.cos(q.a + 0.6);      // doppler beaming: one side brighter
+                        ctx.fillStyle = 'hsla(' + q.hue + ',100%,' + (60 + (1 - q.k) * 30) + '%,' + (0.85 * dop * sc) + ')';
+                        ctx.fillRect(hx + dx, hy + dy, 1.8, 1.8);
+                    }
+                    ctx.globalCompositeOperation = 'source-over';
+                    // the hole itself
+                    ctx.fillStyle = '#000';
+                    ctx.beginPath(); ctx.arc(hx, hy, rr, 0, Math.PI * 2); ctx.fill();
+                    // photon ring + lensed arcs over the top and bottom
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(255,190,110,0.95)'; ctx.shadowBlur = 16;
+                    ctx.strokeStyle = 'rgba(255,225,180,' + (0.95 * sc) + ')'; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.arc(hx, hy, rr * 1.06, 0, Math.PI * 2); ctx.stroke();
+                    ctx.strokeStyle = 'rgba(255,170,90,' + (0.5 * sc) + ')'; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.ellipse(hx, hy, rr * 2.1, rr * 1.15, 0, Math.PI, Math.PI * 2); ctx.stroke();
+                    ctx.beginPath(); ctx.ellipse(hx, hy, rr * 2.1, rr * 1.15, 0, 0, Math.PI); ctx.stroke();
+                    ctx.restore();
+                }
+
+                // final implosion: flash + shockwave
+                if (collapse > 0.85) {
+                    if (!bhBoomed) { bhBoomed = true; sfxBoom(2.6); flash(1, 1.8); bhShock = 0; }
+                    bhShock += dt;
+                }
+                if (bhBoomed) {
+                    const q = clamp(bhShock / 0.7, 0, 1);
+                    ctx.globalCompositeOperation = 'lighter';
+                    ctx.strokeStyle = 'rgba(255,255,255,' + (1 - q) + ')';
+                    ctx.lineWidth = 2 + (1 - q) * 12;
+                    ctx.beginPath(); ctx.arc(cx, cy, Math.max(W, H) * 0.8 * (1 - Math.pow(1 - q, 3)), 0, Math.PI * 2); ctx.stroke();
+                    glow(cx, cy, 30 + q * 120, '255,255,255', 1 - q);
+                    ctx.globalCompositeOperation = 'source-over';
+                }
+            }
+
+            stage.style.transform = shake > 0.1 ? 'translate(' + rnd(-shake, shake).toFixed(1) + 'px,' + rnd(-shake, shake).toFixed(1) + 'px)' : 'none';
+
+            // instability flicker
+            if (Math.random() < 0.06) {
+                ctx.fillStyle = 'rgba(0,0,0,' + rnd(0.2, 0.5) + ')';
+                ctx.fillRect(0, rnd(0, H), W, rnd(3, 30));
+            }
+        });
+
+        stage.style.transform = 'none';
+        if (lines[cur]) { setBar(lines[cur], 1); lines[cur].classList.add('done'); }
+        await sleep(900);
+        log.style.opacity = 0;
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+        await sleep(1800);   // silence in the dark
+    }
+
+    /* ============================================================
+       PHASE 3: Welcome, ArchivistB444
+       ============================================================ */
+    async function phaseWelcome() {
+        const welcome = $('welcome');
+        welcome.classList.add('show');
+        await sleep(300);
+        $('w-small').classList.add('in');
+        await sleep(1700);
+
+        const target = 'ArchivistB444';
+        const el = $('w-name');
+        for (let i = 1; i <= target.length; i++) {
+            el.textContent = target.slice(0, i);
+            sfxHum(0.12, 300 + i * 40, 280 + i * 40, 0.05);
+            await sleep(140);
+        }
+        flash(0.18, 1.5);
+        await sleep(900);
+        $('w-sub').classList.add('in');
+        await sleep(2500);
+        $('replay').style.display = 'block';
+
+        // a new, faint starfield slowly fades back in behind the text (the new universe)
+        const born = Array.from({ length: 220 }, () => ({ x: Math.random(), y: Math.random(), r: rnd(0.3, 1.4), tw: rnd(0, 6.28) }));
+        runLoop(Infinity, (t) => {
+            ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+            const fade = clamp(t / 14, 0, 1) * 0.55;
+            for (const s of born) {
+                const a = fade * (0.6 + 0.4 * Math.sin(t * 1.5 + s.tw));
+                ctx.fillStyle = 'rgba(200,225,255,' + a + ')';
+                ctx.beginPath(); ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2); ctx.fill();
+            }
+        });
+    }
+
+    async function playFinale() {
+        audioInit();
+        $('cinema').classList.add('on');
+        document.body.style.overflow = 'hidden';
+        resize();
+        await sleep(500);
+        const typed = await phaseNotes();                          // ArchivistB443 types his notes
+        await phaseExplode(typed.spans, typed.screamSpans);        // all the text explodes
+        await phaseReset();                                        // "TIMELINE RESETTING"
+        await phaseDelete();                                       // light, matter, black holes
+        await phaseWelcome();                                      // Welcome, ArchivistB444
+    }
+
+    /* ============================================================
+       Page logic: clearance gate + download
+       ============================================================ */
+    document.addEventListener('DOMContentLoaded', async () => {
+        const authStatus = $('auth-status');
+        initTerminalClock('clock-display');
+        initRotatingFavicon();
+        $('replay').addEventListener('click', () => location.reload());
+
+        // Gate: clearance must be END (checked against the database)
+        try {
+            const clearance = await getOperatorClearance();
+            if (clearance !== 'end') throw new Error('INSUFFICIENT PRIVILEGES');
+            authStatus.innerHTML = '<strong style="color:#008000;">[ OK ] CLEARANCE ACCEPTED: END. RECOVERING ARTIFACT...</strong>';
+            setTimeout(() => {
+                authStatus.style.display = 'none';
+                $('artifact').style.display = 'block';
+            }, 1200);
+        } catch (err) {
+            authStatus.innerHTML = '';
+            const box = document.createElement('div');
+            box.style.cssText = 'color:#ff0000;font-weight:bold;';
+            box.textContent = '[!] ACCESS DENIED - REQUIRED: CLEARANCE END - CURRENT: ' + (err.message || 'GUEST') + '. RETURNING TO ROOT INDEX.';
+            authStatus.appendChild(box);
+            setTimeout(() => { window.location.href = BACK_PAGE; }, 2500);
+            return;
+        }
+
+        const dl = $('dl-btn'), go = $('go-btn'), msg = $('msg');
+
+        dl.addEventListener('click', () => {
+            const bin = atob(POLY_B64);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+            const a = document.createElement('a');
+            a.href = url; a.download = 'archivist_log.pdf';
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+            msg.style.color = '#008000';
+            msg.innerText = 'FILE TRANSFERRED. FORMAT: AMBIGUOUS. EXAMINE THE LOG, THEN OPEN THE NOTES.';
+            go.disabled = false;
+        });
+
+        go.addEventListener('click', () => {
+            go.disabled = true; dl.disabled = true;
+            playFinale();
+        });
+    });
+</script>
+</body>
+</html>
