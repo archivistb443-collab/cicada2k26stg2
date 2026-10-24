@@ -68,7 +68,7 @@
     import { getOperatorClearance, submitTensorCollapseFlag, initTerminalClock, initRotatingFavicon } from './scripts.js';
 
     // Where to go after the puzzle is solved (change this to your next page)
-    const NEXT_PAGE = 'final-stage.html';
+    const NEXT_PAGE = 'final_stage.html';
     const BACK_PAGE = 'discrepancies.html';
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -83,6 +83,7 @@
         // Gate: admin only (re-checked here so the URL can't be opened directly)
         try {
             const clearance = await getOperatorClearance();
+            if (clearance === 'end') { window.location.href = NEXT_PAGE; return; }   // already solved
             if (clearance !== 'admin' && clearance !== 'a') throw new Error('INSUFFICIENT PRIVILEGES');
 
             authStatus.innerHTML = '<strong style="color:#008000;">[ OK ] CLEARANCE ACCEPTED: ADMIN. INITIALIZING ISOLATION STATE...</strong>';
@@ -116,9 +117,9 @@
                     return;
                 }
 
-                localStorage.setItem('user_clearance', 'a');
+                localStorage.setItem('user_clearance', 'end');
                 errorMsg.style.color = '#008000';
-                errorMsg.innerText = "SYMMETRY RESTORED. CLEARANCE UPDATED TO 'A'. REDIRECTING...";
+                errorMsg.innerText = "SYMMETRY RESTORED. CLEARANCE UPDATED TO 'END'. REDIRECTING...";
                 setTimeout(() => { window.location.href = NEXT_PAGE; }, 2000);
             } catch (err) {
                 extractBtn.disabled = false;
