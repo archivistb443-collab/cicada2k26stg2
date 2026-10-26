@@ -70,7 +70,7 @@ export async function verifyOperatorClearance() {
     }
 
     try {
-        // Call the secure RPC function instead of querying the locked users table directly
+        // Matches your exact PostgreSQL function arguments: input_username & input_badge
         const { data: profileData, error } = await supabase.rpc('get_operator_profile', {
             input_username: username,
             input_badge: badgeID
@@ -81,6 +81,7 @@ export async function verifyOperatorClearance() {
         if (error || !data) return await failAndRedirect("Credentials mismatched in bureau registry.");
         if (data.status !== 'ACTIVE') return await failAndRedirect(`Operator status suspended [${data.status}].`);
 
+        // Returns verified clearance and details straight from your database row match
         return { success: true, clearance: data.clearance, username, badgeID };
     } catch (err) {
         return await failAndRedirect(`Critical authorization failure: ${err.message}`);

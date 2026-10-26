@@ -62,15 +62,18 @@
     </div>
 </div>
 
-<script>
-    function updateClock() {
-        const display = document.getElementById('clock-display');
-        if(display) {
-            display.innerText = new Date().toISOString().replace('T', ' ').substring(0, 19) + " UTC";
+<script type="module">
+    import { verifyOperatorClearance, initTerminalClock } from './scripts.js';
+
+    initTerminalClock('clock-display');
+
+    (async () => {
+        const session = await verifyOperatorClearance();
+        if (!session || !session.success) {
+            return;
         }
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+        console.log("[SECURITY] Operator clearance verified:", session.clearance);
+    })();
 </script>
 
 </body>
