@@ -142,10 +142,11 @@ async function fetchModuleRecords(directoryName) {
 
         const userTier = session.clearance.toUpperCase();
 
-        // Call the dedicated server-side RPC function securely
         const { data, error } = await supabase.rpc('fetch_module_records', {
             directory_name: directoryName,
-            player_clearance: userTier
+            player_clearance: userTier,
+            input_username: session.username,
+            input_badge: session.badgeID
         });
 
         if (error) {
